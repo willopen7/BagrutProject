@@ -37,21 +37,28 @@ while running:
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_UP:
                 if funcs.check_position("UP", all_sprites):
-                    all_sprites.update("UP", 80)
+                    all_sprites.update("UP", 80, 400, 400)
             if event.key == pygame.K_DOWN:
                 if funcs.check_position("DOWN", all_sprites):
-                    all_sprites.update("DOWN", 80)
+                    all_sprites.update("DOWN", 80, 400, 400)
             if event.key == pygame.K_LEFT:
                 if funcs.check_position("LEFT", all_sprites):
-                    all_sprites.update("LEFT", 80)
+                    all_sprites.update("LEFT", 80, 400, 400)
             if event.key == pygame.K_RIGHT:
                 if funcs.check_position("RIGHT", all_sprites):
-                    all_sprites.update("RIGHT", 80)
+                    all_sprites.update("RIGHT", 80, 400, 400)
         screen.fill(WHITE)
         for x in range(80, SCREEN_WIDTH, GRID_SIZE):
             pygame.draw.line(screen, GRAY, (x, 0), (x, SCREEN_HEIGHT))
         for y in range(80, SCREEN_HEIGHT, GRID_SIZE):
             pygame.draw.line(screen, GRAY, (0, y), (SCREEN_WIDTH, y))
+        opened = False
+        for sprite in all_sprites:
+            if sprite.__class__ == objects.Box and sprite.near_main == True:
+                opened = True
         all_sprites.draw(screen)
         main_chars.draw(screen)
+        if opened:
+            open_box = pygame.image.load("C:\\Users\\User\\Downloads\\Champion_Chest.webp")
+            screen.blit(open_box, (0, 0))
         pygame.display.flip()
