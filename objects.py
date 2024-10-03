@@ -1,5 +1,3 @@
-import random
-
 import pygame.sprite
 
 RED = (255, 0, 0)

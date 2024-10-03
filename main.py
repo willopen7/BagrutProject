@@ -37,16 +37,16 @@ while running:
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_UP:
                 if funcs.check_position("UP", all_sprites):
-                    all_sprites.update("UP", 80, screen=screen)
+                    all_sprites.update("UP", 80)
             if event.key == pygame.K_DOWN:
                 if funcs.check_position("DOWN", all_sprites):
-                    all_sprites.update("DOWN", 80, screen=screen)
+                    all_sprites.update("DOWN", 80)
             if event.key == pygame.K_LEFT:
                 if funcs.check_position("LEFT", all_sprites):
-                    all_sprites.update("LEFT", 80, screen=screen)
+                    all_sprites.update("LEFT", 80)
             if event.key == pygame.K_RIGHT:
                 if funcs.check_position("RIGHT", all_sprites):
-                    all_sprites.update("RIGHT", 80, screen=screen)
+                    all_sprites.update("RIGHT", 80)
         screen.fill(WHITE)
         for x in range(80, SCREEN_WIDTH, GRID_SIZE):
             pygame.draw.line(screen, GRAY, (x, 0), (x, SCREEN_HEIGHT))
@@ -54,3 +54,4 @@ while running:
             pygame.draw.line(screen, GRAY, (0, y), (SCREEN_WIDTH, y))
         all_sprites.draw(screen)
         main_chars.draw(screen)
+        pygame.display.flip()
