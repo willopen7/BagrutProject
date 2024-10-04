@@ -16,11 +16,18 @@ GRID_HEIGHT = SCREEN_HEIGHT // TILE_SIZE
 PLAYER_X = 400
 PLAYER_Y = 400
 
+# VARIABLES
+money = 0
+calm = 100
+focus = 0
+inventory = []
+
 # pygame setup
 pygame.init()
 screen = pygame.display.set_mode((SCREEN_HEIGHT, SCREEN_WIDTH))
 clock = pygame.time.Clock()
 all_sprites = pygame.sprite.Group()
+all_auras = pygame.sprite.Group()
 grid_boxes = [[random.randrange(1, 5, 1) for i in range(1000)] for i in range(1000)] # This will later be replaced with the map
 cur_boxes = [grid_boxes[i] for i in range(GRID_WIDTH // TILE_SIZE)]
 for i in range(100):
@@ -28,6 +35,11 @@ for i in range(100):
     all_sprites.add(box)
     wall = objects.Wall((i-10)*TILE_SIZE,2*TILE_SIZE, TILE_SIZE, TILE_SIZE)
     all_sprites.add(wall)
+gate = objects.Gate(240, 240, TILE_SIZE, TILE_SIZE)
+all_sprites.add(gate)
+monk = objects.Monk(800, 800, TILE_SIZE, TILE_SIZE, TILE_SIZE)
+all_sprites.add(monk)
+all_auras.add(monk.monk_auras)
 main_char = objects.MainChar(PLAYER_X, PLAYER_Y, TILE_SIZE, TILE_SIZE)
 main_chars = pygame.sprite.Group()
 main_chars.add(main_char)
@@ -39,17 +51,21 @@ while running:
             running = False
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_UP:
-                if funcs.check_position("UP", all_sprites, (PLAYER_X, PLAYER_Y), TILE_SIZE):
+                if funcs.check_position("UP", all_sprites, all_auras, calm, (PLAYER_X, PLAYER_Y), TILE_SIZE):
                     all_sprites.update("UP", TILE_SIZE, PLAYER_X, PLAYER_Y)
+                    all_auras.update("UP", TILE_SIZE, PLAYER_X, PLAYER_Y)
             if event.key == pygame.K_DOWN:
-                if funcs.check_position("DOWN", all_sprites,(PLAYER_X, PLAYER_Y), TILE_SIZE):
+                if funcs.check_position("DOWN", all_sprites, all_auras, calm, (PLAYER_X, PLAYER_Y), TILE_SIZE):
                     all_sprites.update("DOWN", TILE_SIZE, PLAYER_X, PLAYER_Y)
+                    all_auras.update("DOWN", TILE_SIZE, PLAYER_X, PLAYER_Y)
             if event.key == pygame.K_LEFT:
-                if funcs.check_position("LEFT", all_sprites,(PLAYER_X, PLAYER_Y), TILE_SIZE):
+                if funcs.check_position("LEFT", all_sprites, all_auras, calm, (PLAYER_X, PLAYER_Y), TILE_SIZE):
                     all_sprites.update("LEFT", TILE_SIZE, PLAYER_X, PLAYER_Y)
+                    all_auras.update("LEFT", TILE_SIZE, PLAYER_X, PLAYER_Y)
             if event.key == pygame.K_RIGHT:
-                if funcs.check_position("RIGHT", all_sprites,(PLAYER_X, PLAYER_Y), TILE_SIZE):
+                if funcs.check_position("RIGHT", all_sprites, all_auras, calm, (PLAYER_X, PLAYER_Y), TILE_SIZE):
                     all_sprites.update("RIGHT", TILE_SIZE, PLAYER_X, PLAYER_Y)
+                    all_auras.update("RIGHT", TILE_SIZE, PLAYER_X, PLAYER_Y)
         screen.fill(WHITE)
         for x in range(TILE_SIZE, SCREEN_WIDTH, TILE_SIZE):
             pygame.draw.line(screen, GRAY, (x, 0), (x, SCREEN_HEIGHT))
@@ -57,8 +73,11 @@ while running:
             pygame.draw.line(screen, GRAY, (0, y), (SCREEN_WIDTH, y))
         opened = False
         for sprite in all_sprites:
-            if sprite.__class__ == objects.Box and sprite.near_main == True:
+            if sprite.__class__ == objects.Box and sprite.near_main is True:
                 opened = True
+            if sprite.__class__ == objects.Gate and sprite.near_main is True:
+                all_sprites.remove(sprite)
+        all_auras.draw(screen)
         all_sprites.draw(screen)
         main_chars.draw(screen)
         if opened:
