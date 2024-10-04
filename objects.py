@@ -3,7 +3,7 @@ import pygame.sprite
 RED = (255, 0, 0)
 
 
-class MapObj(pygame.sprite.Sprite):
+class MapObj(pygame.sprite.Sprite): # a super class for all the map objects
     def __init__(self):
         super().__init__()
         self.near_main = False
@@ -39,7 +39,7 @@ class MapObj(pygame.sprite.Sprite):
             self.near_main = False
 
 
-class Box(MapObj):
+class Box(MapObj): # class of boxes/chests
     def __init__(self, x, y, width, height):
         super().__init__()
         self.image = pygame.image.load("C:\\Users\\User\\Downloads\\images-removebg-preview.png")
@@ -56,7 +56,7 @@ class Box(MapObj):
             #pygame.Surface.blit("C:\\Users\\User\\Downloads\\Champion_Chest.webp", screen)'''
 
 
-class Wall(MapObj):
+class Wall(MapObj): # a class for the map borders or walls
     def __init__(self, x, y, width, height):
         super().__init__()
         self.image = pygame.image.load("C:\\Users\\User\\Downloads\\images.jpg")
@@ -66,12 +66,12 @@ class Wall(MapObj):
         self.rect.y = y
 
 
-class MainChar(pygame.sprite.Sprite):
+class MainChar(pygame.sprite.Sprite): # a class for the main character
     def __init__(self, x, y, width, height):
         super().__init__()
         self.image = pygame.image.load(
             "C:\\Users\\User\\Downloads\\15a9edbe62af9aafdc4dee2f5a5e9420-removebg-preview.png")
-        self.image = pygame.transform.scale(self.image, (80, 80))
+        self.image = pygame.transform.scale(self.image, (width, height))
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
