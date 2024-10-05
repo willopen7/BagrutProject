@@ -8,7 +8,7 @@ class MapObj(pygame.sprite.Sprite): # a super class for all the map objects
         super().__init__()
         self.near_main = False
 
-    def update(self, direct, size, main_x, main_y):
+    def update(self, direct, size, player_x, player_y, portal=False):
         if direct == "UP":
             self.rect.y += size
         if direct == "DOWN":
@@ -17,7 +17,9 @@ class MapObj(pygame.sprite.Sprite): # a super class for all the map objects
             self.rect.x += size
         if direct == "RIGHT":
             self.rect.x -= size
-        if main_x + main_y - size <= self.rect.x + self.rect.y <= main_x + main_y + size and (self.rect.x == main_x or self.rect.y == main_y):
+        if portal:
+            self.rect.x += size * 20
+        if player_x + player_y - size <= self.rect.x + self.rect.y <= player_x + player_y + size and (self.rect.x == player_x or self.rect.y == player_y):
             self.near_main = True
         else:
             self.near_main = False
@@ -32,6 +34,15 @@ class Box(MapObj): # class of boxes/chests
         self.rect.x = x
         self.rect.y = y
 
+
+class Store(MapObj):
+    def __init__(self, x, y, width, height):
+        super().__init__()
+        self.image = pygame.image.load("C:\\Users\\User\\Downloads\\store.jpeg")
+        self.image = pygame.transform.scale(self.image, (width, height))
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
 
 class Wall(MapObj): # a class for the map borders or walls
     def __init__(self, x, y, width, height):
@@ -77,13 +88,39 @@ class MonkAura(MapObj):
         self.rect.x = x
         self.rect.y = y
 
-    def update(self, direct, size, main_x, main_y):
-        super().update(direct, size, main_x, main_y)
-        if main_x == self.rect.x and main_y == self.rect.y:
+    def update(self, direct, size, player_x, player_y, portal=False):
+        super().update(direct, size, player_x, player_y, portal)
+        if player_x == self.rect.x and player_y == self.rect.y:
             self.near_main = True
         else:
             self.near_main = False
 
+
+class Fountain(MapObj):
+    def __init__(self, x, y, width, height):
+        super().__init__()
+        self.image = pygame.image.load("C:\\Users\\User\\Downloads\\fountain.jpeg")
+        self.image = pygame.transform.scale(self.image, (width, height))
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+
+
+class Portal(MapObj):
+    def __init__(self, x, y, width, height):
+        super().__init__()
+        self.image = pygame.image.load("C:\\Users\\User\\Downloads\\Portal.webp")
+        self.image = pygame.transform.scale(self.image, (width, height))
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+
+    def update(self, direct, size, player_x, player_y, portal=False):
+        super().update(direct, size, player_x, player_y, portal)
+        if player_x == self.rect.x and player_y == self.rect.y:
+            self.near_main = True
+        else:
+            self.near_main = False
 
 
 class MainChar(pygame.sprite.Sprite): # a class for the main character
