@@ -132,3 +132,24 @@ class MainChar(pygame.sprite.Sprite): # a class for the main character
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
+
+
+class InventorySlot(pygame.sprite.Sprite):
+    def __init__(self, x, y, width, height):
+        super().__init__()
+        self.image = pygame.image.load("C:\\Users\\User\\Downloads\\inventory_slot.jpg")
+        self.image = pygame.transform.scale(self.image, (width, height))
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+
+
+class InventoryItem(pygame.sprite.Sprite):
+    def __init__(self, x, y, width, height, image_path="C:\\Users\\User\\Downloads\\notexture.png"):
+        super().__init__()
+        self.image = pygame.image.load(image_path)
+        self.image = pygame.transform.scale(self.image, (width, height))
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+        self.amount = 0
