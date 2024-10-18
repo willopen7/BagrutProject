@@ -1,5 +1,6 @@
 import pygame
 import objects
+import random
 
 DESIRED_CALM = 50
 
@@ -27,7 +28,7 @@ def check_action(popup_details, sprite, all_sprites, all_auras, mcf, inventory, 
     if sprite.__class__ == objects.Box:
         # popup_details[0] = True
         # popup_details[1] = pygame.image.load("C:\\Users\\User\\Downloads\\Champion_Chest.webp")
-        inventory[0].amount += 1
+        open_chest(inventory)
         all_sprites.remove(sprite)
     if sprite.__class__ == objects.Store:
         popup_details[0] = True
@@ -40,3 +41,11 @@ def check_action(popup_details, sprite, all_sprites, all_auras, mcf, inventory, 
     if sprite.__class__ == objects.Portal:
         all_sprites.update("", tile_size, player_pos[0], player_pos[1], portal=True)
         all_auras.update("", tile_size, player_pos[0], player_pos[1], portal=True)
+
+
+def open_chest(inventory):
+    chance = random.randint(1, 100)
+    if chance > 60:
+        inventory[1].amount += 1
+    else:
+        inventory[0].amount += 1
