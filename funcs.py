@@ -28,12 +28,13 @@ def check_position(direction, sprites, auras, calm, player_pos=(400, 400),
     return True
 
 
-def check_action(popup_details, sprite, all_sprites, all_auras, mcf, inventory, tile_size, player_pos):
+def check_action(popup_details, sprite, all_sprites, all_auras, mcf, inventory, tile_size, player_pos, boxes):
     if sprite.__class__ == objects.Box:
         # popup_details[0] = True
         # popup_details[1] = pygame.image.load("C:\\Users\\User\\Downloads\\Champion_Chest.webp")
         open_box(inventory, mcf)
         all_sprites.remove(sprite)
+        boxes.remove(sprite)
     if sprite.__class__ == objects.Store:
         popup_details[0] = True
         popup_details[1] = pygame.image.load("C:\\Users\\User\\Downloads\\inside_store.jpg")
@@ -50,17 +51,38 @@ def check_action(popup_details, sprite, all_sprites, all_auras, mcf, inventory, 
 
 def open_box(inventory, mcf):
     chance = random.randint(1, 100)
-    if chance > 85:
+    if chance > 95:
         inventory[1].amount += 1 # player gets a map
-    elif chance > 70:
+    elif chance > 85:
         inventory[0].amount += 1 # player gets shoes
-    elif chance > 55:
+    elif chance > 80:
         inventory[2].amount += 1 # player gets a key
-    elif chance > 40:
+    elif chance > 55:
         mcf[0] += SMALL_MONEY
-    elif chance > 25:
+    elif chance > 45:
         mcf[0] += MEDIUM_MONEY
-    elif chance > 10:
+    elif chance > 40:
         mcf[0] += BIG_MONEY
-    else:
+    elif chance > 38:
         mcf[0] += HUGE_MONEY
+    elif chance > 30:
+        inventory[3].amount += 1 # player gets a compass
+    elif chance > 15:
+        inventory[4].amount += 1 # player gets a calm potion
+    else:
+        inventory[5].amount += 1 # player gets a focus potion
+
+
+def find_closest_box(boxes, player_x, player_y):
+    if len(boxes) == 0:
+        return None
+    closest_box = boxes[0]
+    closest_distance = abs(boxes[0].rect.x - player_x) + abs(boxes[0].rect.y - player_y)
+    for b in boxes:
+        cur = abs(b.rect.x - player_x) + abs(b.rect.y - player_y)
+        if cur < closest_distance:
+            closest_box = b
+            closest_distance = cur
+    return closest_box
+
+

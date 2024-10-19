@@ -241,3 +241,39 @@ class InventoryItem(pygame.sprite.Sprite):
         self.rect.x = x
         self.rect.y = y
         self.amount = 0
+
+
+class CompassArrow(MapObj):
+    def __init__(self, x, y, width, height):
+        super().__init__()
+        self.image = pygame.image.load("C:\\Users\\User\\Downloads\\notexture.png")
+        self.image = pygame.transform.scale(self.image, (width, height))
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+
+    def change_arrow(self, direction):
+        width = self.image.get_width()
+        height = self.image.get_height()
+        if len(direction) == 2:
+            self.image = pygame.image.load("C:\\Users\\User\\Downloads\\arrow.png")
+            self.image = pygame.transform.scale(self.image, (width, height))
+            if direction == 'dl':
+                self.image = pygame.transform.rotate(self.image, 270)
+            elif direction == 'ul':
+                self.image = pygame.transform.rotate(self.image, 180)
+            elif direction == 'ur':
+                self.image = pygame.transform.rotate(self.image, 90)
+        elif len(direction) == 1:
+            self.image = pygame.image.load("C:\\Users\\User\\Downloads\\side_arrow.png")
+            self.image = pygame.transform.scale(self.image, (width, height))
+            if direction == 'd':
+                self.image = pygame.transform.rotate(self.image, 270)
+            elif direction == 'l':
+                self.image = pygame.transform.rotate(self.image, 180)
+            elif direction == 'u':
+                self.image = pygame.transform.rotate(self.image, 90)
+
+    def update(self, direct, size, player_x, player_y, portal=False):
+        super().update(direct, size, player_x, player_y, portal)
+
