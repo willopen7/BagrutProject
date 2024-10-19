@@ -26,12 +26,16 @@ FONT = pygame.font.Font(None, 20)
 MAP_COOLDOWN = 2000
 SHOES_IMAGE_PATH = "C:\\Users\\User\\Downloads\\shoes.png"
 MAP_IMAGE_PATH = "C:\\Users\\User\\Downloads\\map-removebg-preview.png"
+KEY_IMAGE_PATH = "C:\\Users\\User\\Downloads\\key-removebg-preview.png"
+COMPASS_IMAGE_PATH = "C:\\Users\\User\\Downloads\\compass-icon-vector-simple-91662698-removebg-preview.png"
 
 # VARIABLES
 mcf = [10, 40, 0] # [0] is money, [1] is calm and [2] is focus
 current_tile_size = INITIAL_TILE_SIZE
 inventory = [objects.InventoryItem(0, SCREEN_HEIGHT-INITIAL_TILE_SIZE, INITIAL_TILE_SIZE, INITIAL_TILE_SIZE, SHOES_IMAGE_PATH),
-             objects.InventoryItem(INITIAL_TILE_SIZE, SCREEN_HEIGHT-INITIAL_TILE_SIZE, INITIAL_TILE_SIZE, INITIAL_TILE_SIZE, MAP_IMAGE_PATH)] # [0] is shoes, [1] is map
+             objects.InventoryItem(INITIAL_TILE_SIZE, SCREEN_HEIGHT-INITIAL_TILE_SIZE, INITIAL_TILE_SIZE, INITIAL_TILE_SIZE, MAP_IMAGE_PATH),
+             objects.InventoryItem(INITIAL_TILE_SIZE*2, SCREEN_HEIGHT-INITIAL_TILE_SIZE, INITIAL_TILE_SIZE, INITIAL_TILE_SIZE, KEY_IMAGE_PATH)]
+# [0] is shoes, [1] is map, [2] is key
 NUM_SLOTS = len(inventory)
 
 # pygame setup
@@ -39,10 +43,10 @@ screen = pygame.display.set_mode((SCREEN_HEIGHT, SCREEN_WIDTH))
 clock = pygame.time.Clock()
 all_sprites = pygame.sprite.Group()
 all_auras = pygame.sprite.Group()
-grid_boxes = [[random.randrange(1, 5, 1) for i in range(1000)] for i in range(1000)] # This will later be replaced with the map
-cur_boxes = [grid_boxes[i] for i in range(GRID_WIDTH // INITIAL_TILE_SIZE)]
+boxes = []
 for i in range(100):
     box = objects.Box(random.randint(-100, 100)*INITIAL_TILE_SIZE, random.randint(-100, 100)*INITIAL_TILE_SIZE, INITIAL_TILE_SIZE, INITIAL_TILE_SIZE)
+    boxes.append(box)
     all_sprites.add(box)
     wall = objects.Wall((i-10)*INITIAL_TILE_SIZE,2*INITIAL_TILE_SIZE, INITIAL_TILE_SIZE, INITIAL_TILE_SIZE)
     all_sprites.add(wall)
@@ -110,6 +114,8 @@ while running:
                 last_map_use = current_time
                 map_is_used = True
                 inventory[1].amount -= 1
+            elif event.key == pygame.K_c and inventory[3].amount > 0:
+
         screen.fill(WHITE)
         for x in range(current_tile_size, SCREEN_WIDTH, current_tile_size):
             pygame.draw.line(screen, GRAY, (x, 0), (x, SCREEN_HEIGHT))

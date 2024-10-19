@@ -3,6 +3,10 @@ import objects
 import random
 
 DESIRED_CALM = 50
+SMALL_MONEY = 10
+MEDIUM_MONEY = 20
+BIG_MONEY = 30
+HUGE_MONEY = 50
 
 
 def check_position(direction, sprites, auras, calm, player_pos=(400, 400),
@@ -28,13 +32,14 @@ def check_action(popup_details, sprite, all_sprites, all_auras, mcf, inventory, 
     if sprite.__class__ == objects.Box:
         # popup_details[0] = True
         # popup_details[1] = pygame.image.load("C:\\Users\\User\\Downloads\\Champion_Chest.webp")
-        open_chest(inventory)
+        open_box(inventory, mcf)
         all_sprites.remove(sprite)
     if sprite.__class__ == objects.Store:
         popup_details[0] = True
         popup_details[1] = pygame.image.load("C:\\Users\\User\\Downloads\\inside_store.jpg")
-    if sprite.__class__ == objects.Gate:
+    if sprite.__class__ == objects.Gate and inventory[2].amount > 0:
         all_sprites.remove(sprite)
+        inventory[2].amount -= 1
     if sprite.__class__ == objects.Fountain:
         mcf[0] += int((mcf[1] + mcf[2]) / 2)
         all_sprites.remove(sprite)
@@ -43,9 +48,19 @@ def check_action(popup_details, sprite, all_sprites, all_auras, mcf, inventory, 
         all_auras.update("", tile_size, player_pos[0], player_pos[1], portal=True)
 
 
-def open_chest(inventory):
+def open_box(inventory, mcf):
     chance = random.randint(1, 100)
-    if chance > 60:
-        inventory[1].amount += 1
+    if chance > 85:
+        inventory[1].amount += 1 # player gets a map
+    elif chance > 70:
+        inventory[0].amount += 1 # player gets shoes
+    elif chance > 55:
+        inventory[2].amount += 1 # player gets a key
+    elif chance > 40:
+        mcf[0] += SMALL_MONEY
+    elif chance > 25:
+        mcf[0] += MEDIUM_MONEY
+    elif chance > 10:
+        mcf[0] += BIG_MONEY
     else:
-        inventory[0].amount += 1
+        mcf[0] += HUGE_MONEY
