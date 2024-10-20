@@ -43,8 +43,6 @@ inventory = [objects.InventoryItem(0, SCREEN_HEIGHT-INITIAL_TILE_SIZE, INITIAL_T
              objects.InventoryItem(INITIAL_TILE_SIZE*4, SCREEN_HEIGHT-INITIAL_TILE_SIZE, INITIAL_TILE_SIZE, INITIAL_TILE_SIZE, CALM_POTION_PATH),
              objects.InventoryItem(INITIAL_TILE_SIZE*5, SCREEN_HEIGHT-INITIAL_TILE_SIZE, INITIAL_TILE_SIZE, INITIAL_TILE_SIZE, FOCUS_POTION_PATH)]
 # [0] is shoes, [1] is map, [2] is key, [3] is compass, [4] is calm potion, [5] is focus potion
-inventory[4].amount += 1
-inventory[5].amount += 1
 NUM_SLOTS = len(inventory)
 
 # pygame setup
