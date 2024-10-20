@@ -8,7 +8,7 @@ class MapObj(pygame.sprite.Sprite): # a super class for all the map objects
         super().__init__()
         self.near_main = False
 
-    def update(self, direct, size, player_x, player_y, portal=False):
+    def update(self, direct, size, player_x, player_y, portal=False, portal_properties=None):
         if direct == "UP":
             self.rect.y += size
         if direct == "DOWN":
@@ -17,8 +17,10 @@ class MapObj(pygame.sprite.Sprite): # a super class for all the map objects
             self.rect.x += size
         if direct == "RIGHT":
             self.rect.x -= size
-        if portal:
-            self.rect.x += size * 20
+        if portal and portal_properties is not None:
+            if len(portal_properties) == 2:
+                self.rect.x += portal_properties[0]*size
+                self.rect.y += portal_properties[1]*size
         if player_x + player_y - size <= self.rect.x + self.rect.y <= player_x + player_y + size and (self.rect.x == player_x or self.rect.y == player_y): # checks if the player is near the current map object
             self.near_main = True
         else:
@@ -34,8 +36,8 @@ class Box(MapObj): # class of boxes/chests
         self.rect.x = x
         self.rect.y = y
 
-    def update(self, direct, size, player_x, player_y, portal=False, map_use=False, map_end=False):
-        super().update(direct, size, player_x, player_y, portal)
+    def update(self, direct, size, player_x, player_y, portal=False, portal_properties=None, map_use=False, map_end=False):
+        super().update(direct, size, player_x, player_y, portal, portal_properties)
         if map_use:
             self.rect.x = (self.rect.x + player_x) / 2
             self.rect.y = (self.rect.y + player_y) / 2
@@ -55,8 +57,8 @@ class Store(MapObj):
         self.rect.x = x
         self.rect.y = y
 
-    def update(self, direct, size, player_x, player_y, portal=False, map_use=False, map_end=False):
-        super().update(direct, size, player_x, player_y, portal)
+    def update(self, direct, size, player_x, player_y, portal=False, portal_properties=None, map_use=False, map_end=False):
+        super().update(direct, size, player_x, player_y, portal, portal_properties)
         if map_use:
             self.rect.x = (self.rect.x + player_x) / 2
             self.rect.y = (self.rect.y + player_y) / 2
@@ -76,8 +78,8 @@ class Wall(MapObj): # a class for the map borders or walls
         self.rect.x = x
         self.rect.y = y
 
-    def update(self, direct, size, player_x, player_y, portal=False, map_use=False, map_end=False):
-        super().update(direct, size, player_x, player_y, portal)
+    def update(self, direct, size, player_x, player_y, portal=False, portal_properties=None, map_use=False, map_end=False):
+        super().update(direct, size, player_x, player_y, portal, portal_properties)
         if map_use:
             self.rect.x = (self.rect.x + player_x) / 2
             self.rect.y = (self.rect.y + player_y) / 2
@@ -97,8 +99,8 @@ class Gate(MapObj):
         self.rect.x = x
         self.rect.y = y
 
-    def update(self, direct, size, player_x, player_y, portal=False, map_use=False, map_end=False):
-        super().update(direct, size, player_x, player_y, portal)
+    def update(self, direct, size, player_x, player_y, portal=False, portal_properties=None, map_use=False, map_end=False):
+        super().update(direct, size, player_x, player_y, portal, portal_properties)
         if map_use:
             self.rect.x = (self.rect.x + player_x) / 2
             self.rect.y = (self.rect.y + player_y) / 2
@@ -108,8 +110,9 @@ class Gate(MapObj):
             self.rect.y = 2 * self.rect.y - player_y
             self.image = pygame.transform.scale(pygame.image.load("C:\\Users\\User\\Downloads\\gate.png"), (self.image.get_width() * 2, self.image.get_height() * 2))
 
+
 class Monk(MapObj):
-    def __init__(self, x, y, width, height, tile_size):
+    def __init__(self, x, y, width, height):
         super().__init__()
         self.image = pygame.image.load("C:\\Users\\User\\Downloads\\monk-wiki_ver_1 (1).png")
         self.image = pygame.transform.scale(self.image, (width, height))
@@ -119,11 +122,12 @@ class Monk(MapObj):
         self.monk_auras = pygame.sprite.Group()
         for i in range(-2, 3):
             for j in range(-2, 3):
-                aura = MonkAura(x+tile_size*i, y+tile_size*j, width, height)
+                i
+                aura = MonkAura(x+width*i, y+height*j, width, height)
                 self.monk_auras.add(aura)
 
-    def update(self, direct, size, player_x, player_y, portal=False, map_use=False, map_end=False):
-        super().update(direct, size, player_x, player_y, portal)
+    def update(self, direct, size, player_x, player_y, portal=False, portal_properties=None, map_use=False, map_end=False):
+        super().update(direct, size, player_x, player_y, portal, portal_properties)
         if map_use:
             self.rect.x = (self.rect.x + player_x) / 2
             self.rect.y = (self.rect.y + player_y) / 2
@@ -143,8 +147,8 @@ class MonkAura(MapObj):
         self.rect.x = x
         self.rect.y = y
 
-    def update(self, direct, size, player_x, player_y, portal=False, map_use=False, map_end=False):
-        super().update(direct, size, player_x, player_y, portal)
+    def update(self, direct, size, player_x, player_y, portal=False, portal_properties=None, map_use=False, map_end=False):
+        super().update(direct, size, player_x, player_y, portal, portal_properties)
         if player_x == self.rect.x and player_y == self.rect.y:
             self.near_main = True
         else:
@@ -168,8 +172,8 @@ class Fountain(MapObj):
         self.rect.x = x
         self.rect.y = y
 
-    def update(self, direct, size, player_x, player_y, portal=False, map_use=False, map_end=False):
-        super().update(direct, size, player_x, player_y, portal)
+    def update(self, direct, size, player_x, player_y, portal=False, portal_properties=None, map_use=False, map_end=False):
+        super().update(direct, size, player_x, player_y, portal, portal_properties)
         if map_use:
             self.rect.x = (self.rect.x + player_x) / 2
             self.rect.y = (self.rect.y + player_y) / 2
@@ -181,16 +185,18 @@ class Fountain(MapObj):
 
 
 class Portal(MapObj):
-    def __init__(self, x, y, width, height):
+    def __init__(self, x, y, width, height, distance_x, distance_y):
         super().__init__()
         self.image = pygame.image.load("C:\\Users\\User\\Downloads\\Portal.webp")
         self.image = pygame.transform.scale(self.image, (width, height))
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
+        self.distance_x = distance_x
+        self.distance_y = distance_y
 
-    def update(self, direct, size, player_x, player_y, portal=False, map_use=False, map_end=False):
-        super().update(direct, size, player_x, player_y, portal)
+    def update(self, direct, size, player_x, player_y, portal=False, portal_properties=None, map_use=False, map_end=False):
+        super().update(direct, size, player_x, player_y, portal, portal_properties)
         if player_x == self.rect.x and player_y == self.rect.y:
             self.near_main = True
         else:
@@ -275,5 +281,5 @@ class CompassArrow(MapObj):
                 self.image = pygame.transform.rotate(self.image, 90)
 
     def update(self, direct, size, player_x, player_y, portal=False):
-        super().update(direct, size, player_x, player_y, portal)
+        super().update(direct, size, player_x, player_y, portal, portal_properties)
 

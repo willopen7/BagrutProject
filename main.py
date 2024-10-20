@@ -34,7 +34,7 @@ CALM_POTION_PATH = "C:\\Users\\User\\Downloads\\calm_potion.png"
 FOCUS_POTION_PATH = "C:\\Users\\User\\Downloads\\focus_potion.png"
 
 # VARIABLES
-mcf = [10, 40, 0] # [0] is money, [1] is calm and [2] is focus
+mcf = [10, 50, 0] # [0] is money, [1] is calm and [2] is focus
 current_tile_size = INITIAL_TILE_SIZE
 inventory = [objects.InventoryItem(0, SCREEN_HEIGHT-INITIAL_TILE_SIZE, INITIAL_TILE_SIZE, INITIAL_TILE_SIZE, SHOES_IMAGE_PATH),
              objects.InventoryItem(INITIAL_TILE_SIZE, SCREEN_HEIGHT-INITIAL_TILE_SIZE, INITIAL_TILE_SIZE, INITIAL_TILE_SIZE, MAP_IMAGE_PATH),
@@ -51,23 +51,35 @@ clock = pygame.time.Clock()
 all_sprites = pygame.sprite.Group()
 all_auras = pygame.sprite.Group()
 boxes = []
-for i in range(100):
-    box = objects.Box(random.randint(-100, 100)*INITIAL_TILE_SIZE, random.randint(-100, 100)*INITIAL_TILE_SIZE, INITIAL_TILE_SIZE, INITIAL_TILE_SIZE)
-    boxes.append(box)
-    all_sprites.add(box)
-    wall = objects.Wall((i-10)*INITIAL_TILE_SIZE,2*INITIAL_TILE_SIZE, INITIAL_TILE_SIZE, INITIAL_TILE_SIZE)
-    all_sprites.add(wall)
-gate = objects.Gate(240, 240, INITIAL_TILE_SIZE, INITIAL_TILE_SIZE)
-all_sprites.add(gate)
-monk = objects.Monk(800, 800, INITIAL_TILE_SIZE, INITIAL_TILE_SIZE, INITIAL_TILE_SIZE)
+cur_obj = None
+walls_places = [[False, False, False, False, True, True, True, True, True, True, True, True, False, False, False],
+         [False, False, False, False, True, False, False, False, False, False, False, True, False, False, False],
+         [False, False, False, False, True, False, False, False, False, False, False, True, False, False, False],
+         [False, False, False, False, True, False, False, False, False, False, False, True, False, False, False],
+         [True, True, True, True, True, False, False, False, False, False, False, True, True, True, True],
+         [True, False, False, False, False, False, False, False, False, False, False, False, False, False, True],
+         [True, True, True, True, True, False, False, False, False, False, False, False, False, False, True],
+         [False, False, False, False, True, False, False, False, False, False, False, False, False, False, True],
+         [False, False, False, False, True, False, False, False, False, False, False, False, False, False, True],
+         [False, False, False, False, True, False, False, False, False, False, False, False, False, False, True],
+         [False, False, False, False, True, False, False, False, False, False, False, False, False, False, True],
+         [False, False, False, False, True, False, False, False, False, False, False, False, False, False, True],
+         [False, False, False, False, True, True, True, True, True, True, True, True, True, True, True]]
+portal_walls = [[True, True, True, True, True],
+                [True, False, False, False, True],
+                [True, True, True, True, True]]
+boxes_places = [(-2, -4), (-2, -1), (1, -4), (0, -2), (2, -1), (-6, 0), (-7, 0), (5, 4)]
+monk = objects.Monk(PLAYER_X-INITIAL_TILE_SIZE, PLAYER_Y+INITIAL_TILE_SIZE*4, INITIAL_TILE_SIZE, INITIAL_TILE_SIZE)
 all_sprites.add(monk)
-store = objects.Store(-160, 720, INITIAL_TILE_SIZE, INITIAL_TILE_SIZE)
-all_sprites.add(store)
-fountain = objects.Fountain(400, 1040, INITIAL_TILE_SIZE, INITIAL_TILE_SIZE)
-all_sprites.add(fountain)
-portal = objects.Portal(320, -80, INITIAL_TILE_SIZE, INITIAL_TILE_SIZE)
-all_sprites.add(portal)
 all_auras.add(monk.monk_auras)
+all_sprites.add(objects.Fountain(PLAYER_X+INITIAL_TILE_SIZE*4, PLAYER_Y+INITIAL_TILE_SIZE*6, INITIAL_TILE_SIZE, INITIAL_TILE_SIZE))
+all_sprites.add(objects.Store(PLAYER_X+INITIAL_TILE_SIZE*5, PLAYER_Y+INITIAL_TILE_SIZE*2, INITIAL_TILE_SIZE, INITIAL_TILE_SIZE))
+all_sprites.add(objects.Gate(PLAYER_X-INITIAL_TILE_SIZE*4, PLAYER_Y, INITIAL_TILE_SIZE, INITIAL_TILE_SIZE))
+all_sprites.add(objects.Portal(PLAYER_X+INITIAL_TILE_SIZE*5, PLAYER_Y, INITIAL_TILE_SIZE, INITIAL_TILE_SIZE, 17, 0))
+all_sprites.add(objects.Portal(PLAYER_X-INITIAL_TILE_SIZE*14, PLAYER_Y, INITIAL_TILE_SIZE, INITIAL_TILE_SIZE, -14, 0))
+funcs.place_map_object_tuple(all_sprites, objects.Box, boxes_places, (PLAYER_X, PLAYER_Y), INITIAL_TILE_SIZE, boxes=boxes)
+funcs.place_map_object_binary(all_sprites, objects.Wall, walls_places, (8, 5), (PLAYER_X, PLAYER_Y), INITIAL_TILE_SIZE)
+funcs.place_map_object_binary(all_sprites, objects.Wall, portal_walls, (15, 1), (PLAYER_X, PLAYER_Y), INITIAL_TILE_SIZE)
 main_char = objects.MainChar(PLAYER_X, PLAYER_Y, INITIAL_TILE_SIZE, INITIAL_TILE_SIZE)
 main_chars = pygame.sprite.Group()
 main_chars.add(main_char)
@@ -121,7 +133,7 @@ while running:
                         all_sprites.update("RIGHT", current_tile_size, PLAYER_X, PLAYER_Y)
                         all_auras.update("RIGHT", current_tile_size, PLAYER_X, PLAYER_Y)
                         can_move = False
-                    last_move_time = current_time
+                        last_move_time = current_time
             elif event.key == pygame.K_m and inventory[1].amount > 0:
                 current_tile_size = int(INITIAL_TILE_SIZE / 2)
                 all_sprites.update("", current_tile_size, PLAYER_X, PLAYER_Y, portal=False, map_use=True)
