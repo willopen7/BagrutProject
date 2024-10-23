@@ -13,6 +13,7 @@ SCREEN_WIDTH = 880
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 GRAY = (200, 200, 200)
+RED = (255, 0, 0)
 running = True
 INITIAL_TILE_SIZE = 80
 GRID_WIDTH = SCREEN_WIDTH // INITIAL_TILE_SIZE
@@ -32,9 +33,10 @@ KEY_IMAGE_PATH = "C:\\Users\\User\\Downloads\\key-removebg-preview.png"
 COMPASS_IMAGE_PATH = "C:\\Users\\User\\Downloads\\compass-icon-vector-simple-91662698-removebg-preview.png"
 CALM_POTION_PATH = "C:\\Users\\User\\Downloads\\calm_potion.png"
 FOCUS_POTION_PATH = "C:\\Users\\User\\Downloads\\focus_potion.png"
+ITEMS_PRICES = [10, 20, 20, 20, 15, 15]
 
 # VARIABLES
-mcf = [10, 50, 0] # [0] is money, [1] is calm and [2] is focus
+mcf = [90, 50, 0] # [0] is money, [1] is calm and [2] is focus
 current_tile_size = INITIAL_TILE_SIZE
 inventory = [objects.InventoryItem(0, SCREEN_HEIGHT-INITIAL_TILE_SIZE, INITIAL_TILE_SIZE, INITIAL_TILE_SIZE, SHOES_IMAGE_PATH),
              objects.InventoryItem(INITIAL_TILE_SIZE, SCREEN_HEIGHT-INITIAL_TILE_SIZE, INITIAL_TILE_SIZE, INITIAL_TILE_SIZE, MAP_IMAGE_PATH),
@@ -96,6 +98,8 @@ last_map_use = 0
 inventory_slots = pygame.sprite.Group()
 arrow = None
 arrow_shown = False
+store_popup = [False] # a list for passing by reference if a store is opened
+not_enough_money = False
 for i in range(NUM_SLOTS):
     slot = objects.InventorySlot(INITIAL_TILE_SIZE*i, SCREEN_HEIGHT-INITIAL_TILE_SIZE, INITIAL_TILE_SIZE, INITIAL_TILE_SIZE)
     inventory_slots.add(slot)
@@ -110,6 +114,8 @@ while running:
         elif event.type == pygame.KEYDOWN:
             if event.key in (pygame.K_UP, pygame.K_DOWN, pygame.K_LEFT, pygame.K_RIGHT):
                 arrow_shown = False
+                store_popup[0] = False
+                not_enough_money = False
                 if event.key == pygame.K_UP:
                     if funcs.check_position("UP", all_sprites, all_auras, mcf[1], (PLAYER_X, PLAYER_Y), current_tile_size) and can_move:
                         all_sprites.update("UP", current_tile_size, PLAYER_X, PLAYER_Y)
@@ -134,7 +140,7 @@ while running:
                         all_auras.update("RIGHT", current_tile_size, PLAYER_X, PLAYER_Y)
                         can_move = False
                         last_move_time = current_time
-            elif event.key == pygame.K_m and inventory[1].amount > 0:
+            elif event.key == pygame.K_m and inventory[1].amount > 0 and not store_popup[0]:
                 current_tile_size = int(INITIAL_TILE_SIZE / 2)
                 all_sprites.update("", current_tile_size, PLAYER_X, PLAYER_Y, portal=False, map_use=True)
                 all_auras.update("", current_tile_size, PLAYER_X, PLAYER_Y, portal=False, map_use=True)
@@ -142,7 +148,7 @@ while running:
                 last_map_use = current_time
                 map_is_used = True
                 inventory[1].amount -= 1
-            elif event.key == pygame.K_c and inventory[3].amount > 0:
+            elif event.key == pygame.K_c and inventory[3].amount > 0 and not store_popup[0]:
                 closest_box = funcs.find_closest_box(boxes, PLAYER_X, PLAYER_Y)
                 direction = ''
                 arrow_position = [0, 0]
@@ -162,16 +168,60 @@ while running:
                 arrow.change_arrow(direction)
                 arrow_shown = True
                 inventory[3].amount -= 1
-            elif event.key == pygame.K_1 and inventory[4].amount > 0:
-                calm_potion_active = True
-                last_calm_potion_use = current_time
-                mcf[1] += POTIONS_BOOST
-                inventory[4].amount -= 1
-            elif event.key == pygame.K_2 and inventory[5].amount > 0:
-                focus_potion_active = True
-                last_focus_potion_use = current_time
-                mcf[2] += POTIONS_BOOST
-                inventory[5].amount -= 1
+            elif event.key == pygame.K_1 and (inventory[4].amount > 0 or store_popup[0]):
+                if store_popup[0]:
+                    if mcf[0] >= ITEMS_PRICES[0]:
+                        inventory[0].amount += 1
+                        mcf[0] -= ITEMS_PRICES[0]
+                        not_enough_money = False
+                    else:
+                        not_enough_money = True
+                else:
+                    calm_potion_active = True
+                    last_calm_potion_use = current_time
+                    mcf[1] += POTIONS_BOOST
+                    inventory[4].amount -= 1
+            elif event.key == pygame.K_2 and (inventory[5].amount > 0 or store_popup[0]):
+                if store_popup[0]:
+                    if mcf[0] >= ITEMS_PRICES[1]:
+                        inventory[1].amount += 1
+                        mcf[0] -= ITEMS_PRICES[1]
+                        not_enough_money = False
+                    else:
+                        not_enough_money = True
+                else:
+                    focus_potion_active = True
+                    last_focus_potion_use = current_time
+                    mcf[2] += POTIONS_BOOST
+                    inventory[5].amount -= 1
+            elif event.key == pygame.K_3 and store_popup[0]:
+                if mcf[0] >= ITEMS_PRICES[2]:
+                    inventory[2].amount += 1
+                    mcf[0] -= ITEMS_PRICES[2]
+                    not_enough_money = False
+                else:
+                    not_enough_money = True
+            elif event.key == pygame.K_4 and store_popup[0]:
+                if mcf[0] >= ITEMS_PRICES[3]:
+                    inventory[3].amount += 1
+                    mcf[0] -= ITEMS_PRICES[3]
+                    not_enough_money = False
+                else:
+                    not_enough_money = True
+            elif event.key == pygame.K_5 and store_popup[0]:
+                if mcf[0] >= ITEMS_PRICES[4]:
+                    inventory[4].amount += 1
+                    mcf[0] -= ITEMS_PRICES[4]
+                    not_enough_money = False
+                else:
+                    not_enough_money = True
+            elif event.key == pygame.K_6 and store_popup[0]:
+                if mcf[0] >= ITEMS_PRICES[5]:
+                    inventory[5].amount += 1
+                    mcf[0] -= ITEMS_PRICES[5]
+                    not_enough_money = False
+                else:
+                    not_enough_money = True
         screen.fill(WHITE)
         if arrow_shown:
             screen.blit(arrow.image, arrow.rect)
@@ -182,19 +232,29 @@ while running:
         popup_details = [False, None] # a list to pass by reference if a popup window is needed [0] and the popup image [1]
         for sprite in all_sprites:
             if sprite.near_main is True:
-                funcs.check_action(popup_details, sprite, all_sprites, all_auras, mcf, inventory, current_tile_size, (PLAYER_X, PLAYER_Y), boxes)
+                funcs.check_action(popup_details, sprite, all_sprites, all_auras, mcf, inventory, current_tile_size, (PLAYER_X, PLAYER_Y), boxes, store_popup)
                 shoes_cooldown = COOLDOWN_WITHOUT_SHOES/(2**inventory[0].amount)
         all_auras.draw(screen)
         all_sprites.draw(screen)
         main_chars.draw(screen)
-        inventory_slots.draw(screen)
         if popup_details[0]:
             screen.blit(popup_details[1], (0, 0))
+        inventory_slots.draw(screen)
         money_text = FONT.render(f"Money: ${mcf[0]}", True, BLACK)
         inventory_text = FONT.render(f"Inventory:", True, BLACK)
         screen.blit(money_text, MONEY_POS)
-        screen.blit(FONT.render(f"Calm: {mcf[1]}", True, BLACK), (10, 80))
-        screen.blit(FONT.render(f"focus: {mcf[2]}", True, BLACK), (10, 100))
+        if not store_popup[0]:
+            screen.blit(FONT.render(f"Calm: {mcf[1]}", True, BLACK), (10, 80))
+            screen.blit(FONT.render(f"focus: {mcf[2]}", True, BLACK), (10, 100))
+        else:
+            screen.blit(FONT.render(f"SHOES: ${ITEMS_PRICES[0]} (to buy press 1)", True, BLACK), (10, 80))
+            screen.blit(FONT.render(f"MAP: ${ITEMS_PRICES[1]} (to buy press 2)", True, BLACK), (10, 100))
+            screen.blit(FONT.render(f"KEY: ${ITEMS_PRICES[2]} (to buy press 3)", True, BLACK), (10, 120))
+            screen.blit(FONT.render(f"COMPASS: ${ITEMS_PRICES[3]} (to buy press 4)", True, BLACK), (10, 140))
+            screen.blit(FONT.render(f"CALM POTION: ${ITEMS_PRICES[4]} (to buy press 5)", True, BLACK), (10, 160))
+            screen.blit(FONT.render(f"FOCUS POTION: ${ITEMS_PRICES[5]} (to buy press 6)", True, BLACK), (10, 180))
+            if not_enough_money:
+                screen.blit(FONT.render(f"NOT ENOUGH MONEY", True, RED), (400, 400))
         screen.blit(inventory_text, INVENTORY_POS)
         for i in range(len(inventory)):
             count_item = FONT.render(f"{inventory[i].amount}", True, BLACK)

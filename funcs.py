@@ -15,14 +15,11 @@ def check_position(direction, sprites, auras, calm, player_pos=(400, 400),
         if sprite.__class__ != objects.Portal and (
                 (direction == 'UP' and player_pos[0] == sprite.rect.x and sprite.rect.y == player_pos[1] - tile_size)
                 or (
-                        direction == 'DOWN' and player_pos[0] == sprite.rect.x and sprite.rect.y == player_pos[
-                    1] + tile_size)
+                        direction == 'DOWN' and player_pos[0] == sprite.rect.x and sprite.rect.y == player_pos[1] + tile_size)
                 or (
-                        direction == 'LEFT' and player_pos[1] == sprite.rect.y and sprite.rect.x == player_pos[
-                    0] - tile_size)
+                        direction == 'LEFT' and player_pos[1] == sprite.rect.y and sprite.rect.x == player_pos[0] - tile_size)
                 or (
-                        direction == 'RIGHT' and player_pos[1] == sprite.rect.y and sprite.rect.x == player_pos[
-                    0] + tile_size)):
+                        direction == 'RIGHT' and player_pos[1] == sprite.rect.y and sprite.rect.x == player_pos[0] + tile_size)):
             return False
     for aura in auras:
         if aura.near_main is True and calm < DESIRED_CALM:
@@ -30,7 +27,7 @@ def check_position(direction, sprites, auras, calm, player_pos=(400, 400),
     return True
 
 
-def check_action(popup_details, sprite, all_sprites, all_auras, mcf, inventory, tile_size, player_pos, boxes):
+def check_action(popup_details, sprite, all_sprites, all_auras, mcf, inventory, tile_size, player_pos, boxes, store_popup):
     if sprite.__class__ == objects.Box:
         # popup_details[0] = True
         # popup_details[1] = pygame.image.load("C:\\Users\\User\\Downloads\\Champion_Chest.webp")
@@ -39,7 +36,8 @@ def check_action(popup_details, sprite, all_sprites, all_auras, mcf, inventory, 
         boxes.remove(sprite)
     if sprite.__class__ == objects.Store:
         popup_details[0] = True
-        popup_details[1] = pygame.image.load("C:\\Users\\User\\Downloads\\inside_store.jpg")
+        popup_details[1] = pygame.transform.scale(pygame.image.load("C:\\Users\\User\\Downloads\\store_in_game.png"), (880, 880))
+        store_popup[0] = True
     if sprite.__class__ == objects.Gate and inventory[2].amount > 0:
         all_sprites.remove(sprite)
         inventory[2].amount -= 1
