@@ -30,7 +30,7 @@ class MapObj(pygame.sprite.Sprite): # a super class for all the map objects
 class Box(MapObj): # class of boxes/chests
     def __init__(self, x, y, width, height):
         super().__init__()
-        self.image = pygame.image.load("C:\\Users\\User\\Downloads\\images-removebg-preview.png")
+        self.image = pygame.image.load("C:\\Users\\User\\BagrutProject\\icons\\closed-box.png")
         self.image = pygame.transform.scale(self.image, (width, height))
         self.rect = self.image.get_rect()
         self.rect.x = x
@@ -51,7 +51,7 @@ class Box(MapObj): # class of boxes/chests
 class Store(MapObj):
     def __init__(self, x, y, width, height):
         super().__init__()
-        self.image = pygame.image.load("C:\\Users\\User\\Downloads\\store.jpeg")
+        self.image = pygame.image.load("C:\\Users\\User\\BagrutProject\\icons\\store.png")
         self.image = pygame.transform.scale(self.image, (width, height))
         self.rect = self.image.get_rect()
         self.rect.x = x
@@ -72,7 +72,7 @@ class Store(MapObj):
 class Wall(MapObj): # a class for the map borders or walls
     def __init__(self, x, y, width, height):
         super().__init__()
-        self.image = pygame.image.load("C:\\Users\\User\\Downloads\\images.jpg")
+        self.image = pygame.image.load("C:\\Users\\User\\BagrutProject\\icons\\wall.png")
         self.image = pygame.transform.scale(self.image, (width, height))
         self.rect = self.image.get_rect()
         self.rect.x = x
@@ -93,7 +93,7 @@ class Wall(MapObj): # a class for the map borders or walls
 class Gate(MapObj):
     def __init__(self, x, y, width, height):
         super().__init__()
-        self.image = pygame.image.load("C:\\Users\\User\\Downloads\\gate.png")
+        self.image = pygame.image.load("C:\\Users\\User\\BagrutProject\\icons\\gate.png")
         self.image = pygame.transform.scale(self.image, (width, height))
         self.rect = self.image.get_rect()
         self.rect.x = x
@@ -114,7 +114,7 @@ class Gate(MapObj):
 class Monk(MapObj):
     def __init__(self, x, y, width, height):
         super().__init__()
-        self.image = pygame.image.load("C:\\Users\\User\\Downloads\\monk-wiki_ver_1 (1).png")
+        self.image = pygame.image.load("C:\\Users\\User\\BagrutProject\\icons\\monk.png")
         self.image = pygame.transform.scale(self.image, (width, height))
         self.rect = self.image.get_rect()
         self.rect.x = x
@@ -141,7 +141,7 @@ class Monk(MapObj):
 class MonkAura(MapObj):
     def __init__(self, x, y, width, height):
         super().__init__()
-        self.image = pygame.image.load("C:\\Users\\User\\Downloads\\mist_temp.jpg")
+        self.image = pygame.image.load("C:\\Users\\User\\BagrutProject\\icons\\monk-aura.jpg")
         self.image = pygame.transform.scale(self.image, (width, height))
         self.rect = self.image.get_rect()
         self.rect.x = x
@@ -166,7 +166,7 @@ class MonkAura(MapObj):
 class Fountain(MapObj):
     def __init__(self, x, y, width, height):
         super().__init__()
-        self.image = pygame.image.load("C:\\Users\\User\\Downloads\\fountain.jpeg")
+        self.image = pygame.image.load("C:\\Users\\User\\BagrutProject\\icons\\fountain.png")
         self.image = pygame.transform.scale(self.image, (width, height))
         self.rect = self.image.get_rect()
         self.rect.x = x
@@ -214,8 +214,9 @@ class Portal(MapObj):
 class MainChar(pygame.sprite.Sprite): # a class for the main character
     def __init__(self, x, y, width, height):
         super().__init__()
-        self.image = pygame.image.load(
-            "C:\\Users\\User\\Downloads\\15a9edbe62af9aafdc4dee2f5a5e9420-removebg-preview.png")
+        self.image_right = pygame.image.load("C:\\Users\\User\\BagrutProject\\icons\\main_char.png")
+        self.image_left = pygame.transform.flip(self.image_right, True, False)
+        self.image = self.image_right
         self.image = pygame.transform.scale(self.image, (width, height))
         self.rect = self.image.get_rect()
         self.rect.x = x
@@ -280,6 +281,26 @@ class CompassArrow(MapObj):
             elif direction == 'u':
                 self.image = pygame.transform.rotate(self.image, 90)
 
-    def update(self, direct, size, player_x, player_y, portal=False):
+    def update(self, direct, size, player_x, player_y, portal=False, portal_properties=None):
         super().update(direct, size, player_x, player_y, portal, portal_properties)
 
+
+class Grass(MapObj):
+    def __init__(self, x, y, width, height):
+        super().__init__()
+        self.image = pygame.image.load("C:\\Users\\User\\BagrutProject\\icons\\grass.jpg")
+        self.image = pygame.transform.scale(self.image, (width, height))
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+
+    def update(self, direct, size, player_x, player_y, portal=False, portal_properties=None, map_use=False, map_end=False):
+        super().update(direct, size, player_x, player_y, portal, portal_properties)
+        if map_use:
+            self.rect.x = (self.rect.x + player_x) / 2
+            self.rect.y = (self.rect.y + player_y) / 2
+            self.image = pygame.transform.scale(self.image, (self.image.get_width()/2, self.image.get_height()/2))
+        if map_end:
+            self.rect.x = 2 * self.rect.x - player_x
+            self.rect.y = 2 * self.rect.y - player_y
+            self.image = pygame.transform.scale(pygame.image.load("C:\\Users\\User\\Downloads\\grass.jpg"), (self.image.get_width() * 2, self.image.get_height() * 2))

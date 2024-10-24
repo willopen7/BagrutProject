@@ -3,10 +3,11 @@ import objects
 import random
 
 DESIRED_CALM = 50
-SMALL_MONEY = 10
-MEDIUM_MONEY = 20
-BIG_MONEY = 30
-HUGE_MONEY = 50
+SMALL_MONEY = 5
+MEDIUM_MONEY = 10
+BIG_MONEY = 15
+HUGE_MONEY = 30
+OPEN_CHEST_PATH = "C:\\Users\\User\\BagrutProject\\icons\\opened-box.png"
 
 
 def check_position(direction, sprites, auras, calm, player_pos=(400, 400),
@@ -27,13 +28,13 @@ def check_position(direction, sprites, auras, calm, player_pos=(400, 400),
     return True
 
 
-def check_action(popup_details, sprite, all_sprites, all_auras, mcf, inventory, tile_size, player_pos, boxes, store_popup):
-    if sprite.__class__ == objects.Box:
+def check_action(popup_details, sprite, all_sprites, all_auras, all_grass, mcf, inventory, tile_size, player_pos, boxes, store_popup):
+    if sprite.__class__ == objects.Box and sprite in boxes:
         # popup_details[0] = True
         # popup_details[1] = pygame.image.load("C:\\Users\\User\\Downloads\\Champion_Chest.webp")
         open_box(inventory, mcf)
-        all_sprites.remove(sprite)
         boxes.remove(sprite)
+        sprite.image = pygame.transform.scale(pygame.image.load(OPEN_CHEST_PATH), (tile_size, tile_size))
     if sprite.__class__ == objects.Store:
         popup_details[0] = True
         popup_details[1] = pygame.transform.scale(pygame.image.load("C:\\Users\\User\\Downloads\\store_in_game.png"), (880, 880))
@@ -48,6 +49,8 @@ def check_action(popup_details, sprite, all_sprites, all_auras, mcf, inventory, 
         all_sprites.update("", tile_size, player_pos[0], player_pos[1], portal=True,
                            portal_properties=(sprite.distance_x, sprite.distance_y))
         all_auras.update("", tile_size, player_pos[0], player_pos[1], portal=True,
+                         portal_properties=(sprite.distance_x, sprite.distance_y))
+        all_grass.update("", tile_size, player_pos[0], player_pos[1], portal=True,
                          portal_properties=(sprite.distance_x, sprite.distance_y))
 
 

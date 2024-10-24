@@ -21,7 +21,7 @@ GRID_HEIGHT = SCREEN_HEIGHT // INITIAL_TILE_SIZE
 PLAYER_X = 400
 PLAYER_Y = 400
 MONEY_POS = (10, 10)
-INVENTORY_POS = (10, SCREEN_HEIGHT-INITIAL_TILE_SIZE-40)
+INVENTORY_POS = (10, SCREEN_HEIGHT - INITIAL_TILE_SIZE - 40)
 COOLDOWN_WITHOUT_SHOES = 500
 FONT = pygame.font.Font(None, 20)
 MAP_COOLDOWN = 2000
@@ -33,17 +33,23 @@ KEY_IMAGE_PATH = "C:\\Users\\User\\Downloads\\key-removebg-preview.png"
 COMPASS_IMAGE_PATH = "C:\\Users\\User\\Downloads\\compass-icon-vector-simple-91662698-removebg-preview.png"
 CALM_POTION_PATH = "C:\\Users\\User\\Downloads\\calm_potion.png"
 FOCUS_POTION_PATH = "C:\\Users\\User\\Downloads\\focus_potion.png"
-ITEMS_PRICES = [10, 20, 20, 20, 15, 15]
+ITEMS_PRICES = [15, 30, 30, 20, 10, 10]
 
 # VARIABLES
-mcf = [90, 50, 0] # [0] is money, [1] is calm and [2] is focus
+mcf = [90, 50, 0]  # [0] is money, [1] is calm and [2] is focus
 current_tile_size = INITIAL_TILE_SIZE
-inventory = [objects.InventoryItem(0, SCREEN_HEIGHT-INITIAL_TILE_SIZE, INITIAL_TILE_SIZE, INITIAL_TILE_SIZE, SHOES_IMAGE_PATH),
-             objects.InventoryItem(INITIAL_TILE_SIZE, SCREEN_HEIGHT-INITIAL_TILE_SIZE, INITIAL_TILE_SIZE, INITIAL_TILE_SIZE, MAP_IMAGE_PATH),
-             objects.InventoryItem(INITIAL_TILE_SIZE*2, SCREEN_HEIGHT-INITIAL_TILE_SIZE, INITIAL_TILE_SIZE, INITIAL_TILE_SIZE, KEY_IMAGE_PATH),
-             objects.InventoryItem(INITIAL_TILE_SIZE*3, SCREEN_HEIGHT-INITIAL_TILE_SIZE, INITIAL_TILE_SIZE, INITIAL_TILE_SIZE, COMPASS_IMAGE_PATH),
-             objects.InventoryItem(INITIAL_TILE_SIZE*4, SCREEN_HEIGHT-INITIAL_TILE_SIZE, INITIAL_TILE_SIZE, INITIAL_TILE_SIZE, CALM_POTION_PATH),
-             objects.InventoryItem(INITIAL_TILE_SIZE*5, SCREEN_HEIGHT-INITIAL_TILE_SIZE, INITIAL_TILE_SIZE, INITIAL_TILE_SIZE, FOCUS_POTION_PATH)]
+inventory = [
+    objects.InventoryItem(0, SCREEN_HEIGHT - INITIAL_TILE_SIZE, INITIAL_TILE_SIZE, INITIAL_TILE_SIZE, SHOES_IMAGE_PATH),
+    objects.InventoryItem(INITIAL_TILE_SIZE, SCREEN_HEIGHT - INITIAL_TILE_SIZE, INITIAL_TILE_SIZE, INITIAL_TILE_SIZE,
+                          MAP_IMAGE_PATH),
+    objects.InventoryItem(INITIAL_TILE_SIZE * 2, SCREEN_HEIGHT - INITIAL_TILE_SIZE, INITIAL_TILE_SIZE,
+                          INITIAL_TILE_SIZE, KEY_IMAGE_PATH),
+    objects.InventoryItem(INITIAL_TILE_SIZE * 3, SCREEN_HEIGHT - INITIAL_TILE_SIZE, INITIAL_TILE_SIZE,
+                          INITIAL_TILE_SIZE, COMPASS_IMAGE_PATH),
+    objects.InventoryItem(INITIAL_TILE_SIZE * 4, SCREEN_HEIGHT - INITIAL_TILE_SIZE, INITIAL_TILE_SIZE,
+                          INITIAL_TILE_SIZE, CALM_POTION_PATH),
+    objects.InventoryItem(INITIAL_TILE_SIZE * 5, SCREEN_HEIGHT - INITIAL_TILE_SIZE, INITIAL_TILE_SIZE,
+                          INITIAL_TILE_SIZE, FOCUS_POTION_PATH)]
 # [0] is shoes, [1] is map, [2] is key, [3] is compass, [4] is calm potion, [5] is focus potion
 NUM_SLOTS = len(inventory)
 
@@ -52,34 +58,51 @@ screen = pygame.display.set_mode((SCREEN_HEIGHT, SCREEN_WIDTH))
 clock = pygame.time.Clock()
 all_sprites = pygame.sprite.Group()
 all_auras = pygame.sprite.Group()
+all_grass = pygame.sprite.Group()
 boxes = []
 cur_obj = None
 walls_places = [[False, False, False, False, True, True, True, True, True, True, True, True, False, False, False],
-         [False, False, False, False, True, False, False, False, False, False, False, True, False, False, False],
-         [False, False, False, False, True, False, False, False, False, False, False, True, False, False, False],
-         [False, False, False, False, True, False, False, False, False, False, False, True, False, False, False],
-         [True, True, True, True, True, False, False, False, False, False, False, True, True, True, True],
-         [True, False, False, False, False, False, False, False, False, False, False, False, False, False, True],
-         [True, True, True, True, True, False, False, False, False, False, False, False, False, False, True],
-         [False, False, False, False, True, False, False, False, False, False, False, False, False, False, True],
-         [False, False, False, False, True, False, False, False, False, False, False, False, False, False, True],
-         [False, False, False, False, True, False, False, False, False, False, False, False, False, False, True],
-         [False, False, False, False, True, False, False, False, False, False, False, False, False, False, True],
-         [False, False, False, False, True, False, False, False, False, False, False, False, False, False, True],
-         [False, False, False, False, True, True, True, True, True, True, True, True, True, True, True]]
+                [False, False, False, False, True, False, False, False, False, False, False, True, False, False, False],
+                [False, False, False, False, True, False, False, False, False, False, False, True, False, False, False],
+                [False, False, False, False, True, False, False, False, False, False, False, True, False, False, False],
+                [True, True, True, True, True, False, False, False, False, False, False, True, True, True, True],
+                [True, False, False, False, False, False, False, False, False, False, False, False, False, False, True],
+                [True, True, True, True, True, False, False, False, False, False, False, False, False, False, True],
+                [False, False, False, False, True, False, False, False, False, False, False, False, False, False, True],
+                [False, False, False, False, True, False, False, False, False, False, False, False, False, False, True],
+                [False, False, False, False, True, False, False, False, False, False, False, False, False, False, True],
+                [False, False, False, False, True, False, False, False, False, False, False, False, False, False, True],
+                [False, False, False, False, True, False, False, False, False, False, False, False, False, False, True],
+                [False, False, False, False, True, True, True, True, True, True, True, True, True, True, True]]
 portal_walls = [[True, True, True, True, True],
                 [True, False, False, False, True],
                 [True, True, True, True, True]]
-boxes_places = [(-2, -4), (-2, -1), (1, -4), (0, -2), (2, -1), (-6, 0), (-7, 0), (5, 4)]
-monk = objects.Monk(PLAYER_X-INITIAL_TILE_SIZE, PLAYER_Y+INITIAL_TILE_SIZE*4, INITIAL_TILE_SIZE, INITIAL_TILE_SIZE)
+grass_places = [[False, False, False, False, True, True, True, True, True, True, False, False, False, False, False],
+                [False, False, False, False, True, True, True, True, True, True, False, False, False, False, False],
+                [False, False, False, False, True, True, True, True, True, True, False, False, False, False, False],
+                [False, False, False, False, True, True, True, True, True, True, False, False, False, False, False],
+                [True, True, True, True, True, True, True, True, True, True, True, True, True],
+                [False, False, False, False, True, True, True, True, True, True, True, True, True],
+                [False, False, False, False, True, True, True, True, True, True, True, True, True],
+                [False, False, False, False, True, True, True, True, True, True, True, True, True],
+                [False, False, False, False, True, True, True, True, True, True, True, True, True],
+                [False, False, False, False, True, True, True, True, True, True, True, True, True],
+                [False, False, False, False, True, True, True, True, True, True, True, True, True]]
+boxes_places = [(-2, -4), (-2, -1), (1, -4), (0, -2), (2, -1), (-7, 0), (5, 4)]
+monk = objects.Monk(PLAYER_X - INITIAL_TILE_SIZE, PLAYER_Y + INITIAL_TILE_SIZE * 4, INITIAL_TILE_SIZE, INITIAL_TILE_SIZE)
 all_sprites.add(monk)
 all_auras.add(monk.monk_auras)
-all_sprites.add(objects.Fountain(PLAYER_X+INITIAL_TILE_SIZE*4, PLAYER_Y+INITIAL_TILE_SIZE*6, INITIAL_TILE_SIZE, INITIAL_TILE_SIZE))
-all_sprites.add(objects.Store(PLAYER_X+INITIAL_TILE_SIZE*5, PLAYER_Y+INITIAL_TILE_SIZE*2, INITIAL_TILE_SIZE, INITIAL_TILE_SIZE))
-all_sprites.add(objects.Gate(PLAYER_X-INITIAL_TILE_SIZE*4, PLAYER_Y, INITIAL_TILE_SIZE, INITIAL_TILE_SIZE))
-all_sprites.add(objects.Portal(PLAYER_X+INITIAL_TILE_SIZE*5, PLAYER_Y, INITIAL_TILE_SIZE, INITIAL_TILE_SIZE, 17, 0))
-all_sprites.add(objects.Portal(PLAYER_X-INITIAL_TILE_SIZE*14, PLAYER_Y, INITIAL_TILE_SIZE, INITIAL_TILE_SIZE, -14, 0))
-funcs.place_map_object_tuple(all_sprites, objects.Box, boxes_places, (PLAYER_X, PLAYER_Y), INITIAL_TILE_SIZE, boxes=boxes)
+all_sprites.add(objects.Fountain(PLAYER_X + INITIAL_TILE_SIZE * 4, PLAYER_Y + INITIAL_TILE_SIZE * 6, INITIAL_TILE_SIZE, INITIAL_TILE_SIZE))
+all_sprites.add(objects.Store(PLAYER_X + INITIAL_TILE_SIZE * 5, PLAYER_Y + INITIAL_TILE_SIZE * 2, INITIAL_TILE_SIZE, INITIAL_TILE_SIZE))
+all_sprites.add(objects.Gate(PLAYER_X - INITIAL_TILE_SIZE * 4, PLAYER_Y, INITIAL_TILE_SIZE, INITIAL_TILE_SIZE))
+all_sprites.add(objects.Portal(PLAYER_X + INITIAL_TILE_SIZE * 5, PLAYER_Y, INITIAL_TILE_SIZE, INITIAL_TILE_SIZE, 17, 0))
+all_sprites.add(objects.Portal(PLAYER_X - INITIAL_TILE_SIZE * 14, PLAYER_Y, INITIAL_TILE_SIZE, INITIAL_TILE_SIZE, -14, 0))
+all_grass.add(objects.Grass(PLAYER_X-INITIAL_TILE_SIZE*14, PLAYER_Y, INITIAL_TILE_SIZE, INITIAL_TILE_SIZE))
+all_grass.add(objects.Grass(PLAYER_X-INITIAL_TILE_SIZE*13, PLAYER_Y, INITIAL_TILE_SIZE, INITIAL_TILE_SIZE))
+all_grass.add(objects.Grass(PLAYER_X-INITIAL_TILE_SIZE*12, PLAYER_Y, INITIAL_TILE_SIZE, INITIAL_TILE_SIZE))
+funcs.place_map_object_binary(all_grass, objects.Grass, grass_places, (7, 4), (PLAYER_X, PLAYER_Y), INITIAL_TILE_SIZE)
+funcs.place_map_object_tuple(all_sprites, objects.Box, boxes_places, (PLAYER_X, PLAYER_Y), INITIAL_TILE_SIZE,
+                             boxes=boxes)
 funcs.place_map_object_binary(all_sprites, objects.Wall, walls_places, (8, 5), (PLAYER_X, PLAYER_Y), INITIAL_TILE_SIZE)
 funcs.place_map_object_binary(all_sprites, objects.Wall, portal_walls, (15, 1), (PLAYER_X, PLAYER_Y), INITIAL_TILE_SIZE)
 main_char = objects.MainChar(PLAYER_X, PLAYER_Y, INITIAL_TILE_SIZE, INITIAL_TILE_SIZE)
@@ -98,10 +121,11 @@ last_map_use = 0
 inventory_slots = pygame.sprite.Group()
 arrow = None
 arrow_shown = False
-store_popup = [False] # a list for passing by reference if a store is opened
+store_popup = [False]  # a list for passing by reference if a store is opened
 not_enough_money = False
 for i in range(NUM_SLOTS):
-    slot = objects.InventorySlot(INITIAL_TILE_SIZE*i, SCREEN_HEIGHT-INITIAL_TILE_SIZE, INITIAL_TILE_SIZE, INITIAL_TILE_SIZE)
+    slot = objects.InventorySlot(INITIAL_TILE_SIZE * i, SCREEN_HEIGHT - INITIAL_TILE_SIZE, INITIAL_TILE_SIZE,
+                                 INITIAL_TILE_SIZE)
     inventory_slots.add(slot)
     inventory_slots.add(inventory[i])
 
@@ -117,29 +141,41 @@ while running:
                 store_popup[0] = False
                 not_enough_money = False
                 if event.key == pygame.K_UP:
-                    if funcs.check_position("UP", all_sprites, all_auras, mcf[1], (PLAYER_X, PLAYER_Y), current_tile_size) and can_move:
+                    if funcs.check_position("UP", all_sprites, all_auras, mcf[1], (PLAYER_X, PLAYER_Y),
+                                            current_tile_size) and can_move:
                         all_sprites.update("UP", current_tile_size, PLAYER_X, PLAYER_Y)
                         all_auras.update("UP", current_tile_size, PLAYER_X, PLAYER_Y)
+                        all_grass.update("UP", current_tile_size, PLAYER_X, PLAYER_Y)
                         can_move = False
                         last_move_time = current_time
                 elif event.key == pygame.K_DOWN:
-                    if funcs.check_position("DOWN", all_sprites, all_auras, mcf[1], (PLAYER_X, PLAYER_Y), current_tile_size) and can_move:
+                    if funcs.check_position("DOWN", all_sprites, all_auras, mcf[1], (PLAYER_X, PLAYER_Y),
+                                            current_tile_size) and can_move:
                         all_sprites.update("DOWN", current_tile_size, PLAYER_X, PLAYER_Y)
                         all_auras.update("DOWN", current_tile_size, PLAYER_X, PLAYER_Y)
+                        all_grass.update("DOWN", current_tile_size, PLAYER_X, PLAYER_Y)
                         can_move = False
                         last_move_time = current_time
                 elif event.key == pygame.K_LEFT:
-                    if funcs.check_position("LEFT", all_sprites, all_auras, mcf[1], (PLAYER_X, PLAYER_Y), current_tile_size) and can_move:
+                    if funcs.check_position("LEFT", all_sprites, all_auras, mcf[1], (PLAYER_X, PLAYER_Y),
+                                            current_tile_size) and can_move:
                         all_sprites.update("LEFT", current_tile_size, PLAYER_X, PLAYER_Y)
                         all_auras.update("LEFT", current_tile_size, PLAYER_X, PLAYER_Y)
+                        all_grass.update("LEFT", current_tile_size, PLAYER_X, PLAYER_Y)
                         can_move = False
                         last_move_time = current_time
+                        main_char.image = main_char.image_left
+                        main_char.image = pygame.transform.scale(main_char.image, (current_tile_size, current_tile_size))
                 elif event.key == pygame.K_RIGHT:
-                    if funcs.check_position("RIGHT", all_sprites, all_auras, mcf[1], (PLAYER_X, PLAYER_Y), tile_size=current_tile_size) and can_move:
+                    if funcs.check_position("RIGHT", all_sprites, all_auras, mcf[1], (PLAYER_X, PLAYER_Y),
+                                            tile_size=current_tile_size) and can_move:
                         all_sprites.update("RIGHT", current_tile_size, PLAYER_X, PLAYER_Y)
                         all_auras.update("RIGHT", current_tile_size, PLAYER_X, PLAYER_Y)
+                        all_grass.update("RIGHT", current_tile_size, PLAYER_X, PLAYER_Y)
                         can_move = False
                         last_move_time = current_time
+                        main_char.image = main_char.image_right
+                        main_char.image = pygame.transform.scale(main_char.image, (current_tile_size, current_tile_size))
             elif event.key == pygame.K_m and inventory[1].amount > 0 and not store_popup[0]:
                 current_tile_size = int(INITIAL_TILE_SIZE / 2)
                 all_sprites.update("", current_tile_size, PLAYER_X, PLAYER_Y, portal=False, map_use=True)
@@ -164,11 +200,14 @@ while running:
                 elif closest_box.rect.x > PLAYER_X:
                     direction += 'r'
                     arrow_position[0] += 1
-                arrow = objects.CompassArrow(PLAYER_X+current_tile_size*arrow_position[0], PLAYER_Y+current_tile_size*arrow_position[1], current_tile_size, current_tile_size)
+                arrow = objects.CompassArrow(PLAYER_X + current_tile_size * arrow_position[0],
+                                             PLAYER_Y + current_tile_size * arrow_position[1], current_tile_size,
+                                             current_tile_size)
                 arrow.change_arrow(direction)
                 arrow_shown = True
                 inventory[3].amount -= 1
-            elif event.key == pygame.K_1 and (inventory[4].amount > 0 or store_popup[0]):
+            elif event.key == pygame.K_1 and (
+                    (inventory[4].amount > 0 and calm_potion_active is False) or store_popup[0]):
                 if store_popup[0]:
                     if mcf[0] >= ITEMS_PRICES[0]:
                         inventory[0].amount += 1
@@ -181,7 +220,8 @@ while running:
                     last_calm_potion_use = current_time
                     mcf[1] += POTIONS_BOOST
                     inventory[4].amount -= 1
-            elif event.key == pygame.K_2 and (inventory[5].amount > 0 or store_popup[0]):
+            elif event.key == pygame.K_2 and (
+                    (inventory[5].amount > 0 and focus_potion_active is False) or store_popup[0]):
                 if store_popup[0]:
                     if mcf[0] >= ITEMS_PRICES[1]:
                         inventory[1].amount += 1
@@ -222,31 +262,35 @@ while running:
                     not_enough_money = False
                 else:
                     not_enough_money = True
-        screen.fill(WHITE)
-        if arrow_shown:
-            screen.blit(arrow.image, arrow.rect)
-        for x in range(current_tile_size, SCREEN_WIDTH, current_tile_size):
+        screen.fill(BLACK)
+        '''for x in range(current_tile_size, SCREEN_WIDTH, current_tile_size):
             pygame.draw.line(screen, GRAY, (x, 0), (x, SCREEN_HEIGHT))
         for y in range(current_tile_size, SCREEN_HEIGHT, current_tile_size):
-            pygame.draw.line(screen, GRAY, (0, y), (SCREEN_WIDTH, y))
-        popup_details = [False, None] # a list to pass by reference if a popup window is needed [0] and the popup image [1]
+            pygame.draw.line(screen, GRAY, (0, y), (SCREEN_WIDTH, y))'''
+        popup_details = [False,
+                         None]  # a list to pass by reference if a popup window is needed [0] and the popup image [1]
         for sprite in all_sprites:
             if sprite.near_main is True:
-                funcs.check_action(popup_details, sprite, all_sprites, all_auras, mcf, inventory, current_tile_size, (PLAYER_X, PLAYER_Y), boxes, store_popup)
-                shoes_cooldown = COOLDOWN_WITHOUT_SHOES/(2**inventory[0].amount)
+                funcs.check_action(popup_details, sprite, all_sprites, all_auras, all_grass, mcf, inventory, current_tile_size,
+                                   (PLAYER_X, PLAYER_Y), boxes, store_popup)
+                shoes_cooldown = COOLDOWN_WITHOUT_SHOES / (2 ** inventory[0].amount)
+        all_grass.draw(screen)
         all_auras.draw(screen)
         all_sprites.draw(screen)
         main_chars.draw(screen)
+        if arrow_shown:
+            screen.blit(arrow.image, arrow.rect)
         if popup_details[0]:
             screen.blit(popup_details[1], (0, 0))
         inventory_slots.draw(screen)
-        money_text = FONT.render(f"Money: ${mcf[0]}", True, BLACK)
-        inventory_text = FONT.render(f"Inventory:", True, BLACK)
+        money_text = FONT.render(f"Money: ${mcf[0]}", True, WHITE)
+        inventory_text = FONT.render(f"Inventory:", True, WHITE)
         screen.blit(money_text, MONEY_POS)
         if not store_popup[0]:
-            screen.blit(FONT.render(f"Calm: {mcf[1]}", True, BLACK), (10, 80))
-            screen.blit(FONT.render(f"focus: {mcf[2]}", True, BLACK), (10, 100))
+            screen.blit(FONT.render(f"Calm: {mcf[1]}", True, WHITE), (10, 30))
+            screen.blit(FONT.render(f"focus: {mcf[2]}", True, WHITE), (10, 50))
         else:
+            screen.blit(FONT.render(f"Money: ${mcf[0]}", True, BLACK), (10, 10))
             screen.blit(FONT.render(f"SHOES: ${ITEMS_PRICES[0]} (to buy press 1)", True, BLACK), (10, 80))
             screen.blit(FONT.render(f"MAP: ${ITEMS_PRICES[1]} (to buy press 2)", True, BLACK), (10, 100))
             screen.blit(FONT.render(f"KEY: ${ITEMS_PRICES[2]} (to buy press 3)", True, BLACK), (10, 120))
@@ -272,6 +316,7 @@ while running:
         map_is_used = False
         current_tile_size *= 2
         all_sprites.update("", current_tile_size, PLAYER_X, PLAYER_Y, portal=False, map_end=True)
+        all_grass.update("", current_tile_size, PLAYER_X, PLAYER_Y, portal=False, map_end=True)
         all_auras.update("", current_tile_size, PLAYER_X, PLAYER_Y, portal=False, map_end=True)
         main_chars.update(False, True)
     clock.tick(60)
