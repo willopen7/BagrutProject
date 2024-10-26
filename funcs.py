@@ -7,7 +7,8 @@ SMALL_MONEY = 5
 MEDIUM_MONEY = 10
 BIG_MONEY = 15
 HUGE_MONEY = 30
-OPEN_CHEST_PATH = "C:\\Users\\User\\BagrutProject\\icons\\opened-box.png"
+OPEN_BOX_PATH = "icons\\opened-box.png"
+STORE_IN_GAME_PATH = "icons\\store_in_game.png"
 
 
 def check_position(direction, sprites, auras, calm, player_pos=(400, 400),
@@ -28,16 +29,15 @@ def check_position(direction, sprites, auras, calm, player_pos=(400, 400),
     return True
 
 
-def check_action(popup_details, sprite, all_sprites, all_auras, all_grass, mcf, inventory, tile_size, player_pos, boxes, store_popup):
+def check_action(popup_details, sprite, all_sprites, all_auras, all_grass, mcf, inventory, tile_size, player_pos, boxes, store_popup): # checks which class is a specific sprite which is near the player and acts correspondingly
     if sprite.__class__ == objects.Box and sprite in boxes:
-        # popup_details[0] = True
-        # popup_details[1] = pygame.image.load("C:\\Users\\User\\Downloads\\Champion_Chest.webp")
         open_box(inventory, mcf)
         boxes.remove(sprite)
-        sprite.image = pygame.transform.scale(pygame.image.load(OPEN_CHEST_PATH), (tile_size, tile_size))
+        sprite.image = pygame.transform.scale(pygame.image.load(OPEN_BOX_PATH), (tile_size, tile_size))
+        sprite.opened = True
     if sprite.__class__ == objects.Store:
         popup_details[0] = True
-        popup_details[1] = pygame.transform.scale(pygame.image.load("C:\\Users\\User\\Downloads\\store_in_game.png"), (880, 880))
+        popup_details[1] = pygame.transform.scale(pygame.image.load(STORE_IN_GAME_PATH), (880, 880))
         store_popup[0] = True
     if sprite.__class__ == objects.Gate and inventory[2].amount > 0:
         all_sprites.remove(sprite)
@@ -54,7 +54,7 @@ def check_action(popup_details, sprite, all_sprites, all_auras, all_grass, mcf, 
                          portal_properties=(sprite.distance_x, sprite.distance_y))
 
 
-def open_box(inventory, mcf):
+def open_box(inventory, mcf): # creates a random variable to decide the item the player recieves from a box
     chance = random.randint(1, 100)
     if chance > 95:
         inventory[1].amount += 1  # player gets a map
@@ -78,7 +78,7 @@ def open_box(inventory, mcf):
         inventory[5].amount += 1  # player gets a focus potion
 
 
-def find_closest_box(boxes, player_x, player_y):
+def find_closest_box(boxes, player_x, player_y): # a function for the compass object that finds the closest box to the player
     if len(boxes) == 0:
         return None
     closest_box = boxes[0]
@@ -91,7 +91,7 @@ def find_closest_box(boxes, player_x, player_y):
     return closest_box
 
 
-def place_map_object_binary(all_sprites, object_type, places, start_coords, main_coords, tile_size, boxes=None):
+def place_map_object_binary(all_sprites, object_type, places, start_coords, main_coords, tile_size, boxes=None): # a function that helps to place many map objects by creating a 2D bool list and using it as a reference for placing the objects
     for i in range(len(places)):
         for j in range(len(places[i])):
             if places[i][j]:
@@ -103,7 +103,7 @@ def place_map_object_binary(all_sprites, object_type, places, start_coords, main
                     boxes.append(cur_obj)
 
 
-def place_map_object_tuple(all_sprites, object_type, places, main_coords, tile_size, boxes=None):
+def place_map_object_tuple(all_sprites, object_type, places, main_coords, tile_size, boxes=None): # another function for placing map objects, but this is used when the objects are sparse using a list with specific coordinates of each object
     for i in range(len(places)):
         cur_obj = object_type(main_coords[0] + places[i][0] * tile_size, main_coords[1] + places[i][1] * tile_size,
                               tile_size, tile_size)
