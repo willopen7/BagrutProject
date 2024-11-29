@@ -1,3 +1,4 @@
+# objects.py
 import pygame.sprite
 
 RED = (255, 0, 0)

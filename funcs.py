@@ -1,3 +1,4 @@
+# funcs.py
 import pygame
 import objects
 import random
