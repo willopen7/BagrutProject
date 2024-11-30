@@ -31,3 +31,14 @@ class BLEModule:
             await self.client.write_gatt_char(char_uuid, data)
         else:
             raise RuntimeError("No connected client")
+
+    async def print_services_and_characteristics(self):
+        """Print all services and characteristics of the BLE device."""
+        if not self.client or not self.client.is_connected:
+            raise Exception("Client is not connected.")
+
+        services = self.client.services
+        for service in services:
+            print(f"- Service: {service.uuid}")
+            for char in service.characteristics:
+                print(f"  - Characteristic: {char.uuid} (Properties: {char.properties})")

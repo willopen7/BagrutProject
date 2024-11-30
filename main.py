@@ -7,8 +7,6 @@ import ble_connection
 import asyncio
 
 
-
-
 # running the game
 def game_loop():
     # initialize the game
