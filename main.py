@@ -40,7 +40,7 @@ def game_loop():
     COMPASS_IMAGE_PATH = "icons\\compass.png"
     CALM_POTION_PATH = "icons\\calm_potion.png"
     FOCUS_POTION_PATH = "icons\\focus_potion.png"
-    ITEMS_PRICES = [15, 30, 30, 20, 10, 10]
+    ITEMS_PRICES = [15, 30, 30, 20, 10, 10] # [0] is shoes, [1] is map, [2] is key, [3] is compass, [4] is calm potion, [5] is focus potion
 
     # VARIABLES
     mcf = [90, 50, 0]  # [0] is money, [1] is calm and [2] is focus
