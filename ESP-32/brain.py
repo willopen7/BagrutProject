@@ -5,7 +5,7 @@ class Brain:
     MAX_PACKET_LENGTH = 32
     EEG_POWER_BANDS = 8
 
-    def __init__(self, uart_port, baud_rate=9600):
+    def __init__(self, uart_port, baud_rate=57600):
         # Initialize UART
         self.uart = UART(uart_port, baudrate=baud_rate)
 

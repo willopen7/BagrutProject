@@ -75,6 +75,9 @@ def game_loop():
     arrow_shown = False
     store_popup = [False]  # a list for passing by reference if a store is opened
     not_enough_money = False
+    current_position = [15, 3]
+    types_of_blocks = {'0': objects.Grass, '1': objects.Wall, '2': objects.Box, '3': objects.Fountain,
+                       '4': objects.Store, '5': objects.Box, '6': objects.Gate, '7': objects.Monk}
 
     # pygame setup
     screen = pygame.display.set_mode((SCREEN_HEIGHT, SCREEN_WIDTH))
@@ -84,9 +87,12 @@ def game_loop():
     all_sprites = pygame.sprite.Group()
     all_auras = pygame.sprite.Group()
     all_grass = pygame.sprite.Group()
+    all_rendered = pygame.sprite.Group()
+    rendered_grass = pygame.sprite.Group()
+    rendered_auras = pygame.sprite.Group()
     boxes = []
     cur_obj = None
-    walls_places = [[False, False, False, False, True, True, True, True, True, True, True, True, False, False, False],
+    '''walls_places = [[False, False, False, False, True, True, True, True, True, True, True, True, False, False, False],
                     [False, False, False, False, True, False, False, False, False, False, False, True, False, False,
                      False],
                     [False, False, False, False, True, False, False, False, False, False, False, True, False, False,
@@ -142,7 +148,8 @@ def game_loop():
     funcs.place_map_object_binary(all_sprites, objects.Wall, walls_places, (8, 5), (PLAYER_X, PLAYER_Y),
                                   INITIAL_TILE_SIZE)
     funcs.place_map_object_binary(all_sprites, objects.Wall, portal_walls, (15, 1), (PLAYER_X, PLAYER_Y),
-                                  INITIAL_TILE_SIZE)
+                                  INITIAL_TILE_SIZE)'''
+    map_coords = funcs.generate_map_txt(types_of_blocks, 'map.txt', INITIAL_TILE_SIZE, current_position, all_sprites, all_grass, all_auras, boxes=boxes)
     main_char = objects.MainChar(PLAYER_X, PLAYER_Y, INITIAL_TILE_SIZE, INITIAL_TILE_SIZE)
     main_chars = pygame.sprite.Group()
     main_chars.add(main_char)
@@ -164,52 +171,66 @@ def game_loop():
                     store_popup[0] = False
                     not_enough_money = False
                     if event.key == pygame.K_UP:
-                        if funcs.check_position("UP", all_sprites, all_auras, mcf[1], (PLAYER_X, PLAYER_Y),
-                                                current_tile_size) and can_move:
-                            all_sprites.update("UP", current_tile_size, PLAYER_X, PLAYER_Y)
+                        if funcs.check_position("UP", all_sprites, all_auras, mcf[1], current_position,
+                                                tile_size=current_tile_size) and (can_move or map_is_used):
+                            current_position[1] -= 1
+                            '''all_sprites.update("UP", current_tile_size, PLAYER_X, PLAYER_Y)
                             all_auras.update("UP", current_tile_size, PLAYER_X, PLAYER_Y)
-                            all_grass.update("UP", current_tile_size, PLAYER_X, PLAYER_Y)
+                            all_grass.update("UP", current_tile_size, PLAYER_X, PLAYER_Y)'''
                             can_move = False
                             last_move_time = current_time
                     elif event.key == pygame.K_DOWN:
-                        if funcs.check_position("DOWN", all_sprites, all_auras, mcf[1], (PLAYER_X, PLAYER_Y),
-                                                current_tile_size) and can_move:
-                            all_sprites.update("DOWN", current_tile_size, PLAYER_X, PLAYER_Y)
+                        if funcs.check_position("DOWN", all_sprites, all_auras, mcf[1], current_position,
+                                                tile_size=current_tile_size) and (can_move or map_is_used):
+                            current_position[1] += 1
+                            '''all_sprites.update("DOWN", current_tile_size, PLAYER_X, PLAYER_Y)
                             all_auras.update("DOWN", current_tile_size, PLAYER_X, PLAYER_Y)
-                            all_grass.update("DOWN", current_tile_size, PLAYER_X, PLAYER_Y)
+                            all_grass.update("DOWN", current_tile_size, PLAYER_X, PLAYER_Y)'''
                             can_move = False
                             last_move_time = current_time
                     elif event.key == pygame.K_LEFT:
-                        if funcs.check_position("LEFT", all_sprites, all_auras, mcf[1], (PLAYER_X, PLAYER_Y),
-                                                current_tile_size) and can_move:
-                            all_sprites.update("LEFT", current_tile_size, PLAYER_X, PLAYER_Y)
+                        print('c')
+                        if funcs.check_position("LEFT", all_sprites, all_auras, mcf[1], current_position,
+                                                tile_size=current_tile_size) and (can_move or map_is_used):
+                            print('a')
+                            current_position[0] -= 1
+                            '''all_sprites.update("LEFT", current_tile_size, PLAYER_X, PLAYER_Y)
                             all_auras.update("LEFT", current_tile_size, PLAYER_X, PLAYER_Y)
-                            all_grass.update("LEFT", current_tile_size, PLAYER_X, PLAYER_Y)
+                            all_grass.update("LEFT", current_tile_size, PLAYER_X, PLAYER_Y)'''
                             can_move = False
                             last_move_time = current_time
                             main_char.image = main_char.image_left
                             main_char.image = pygame.transform.scale(main_char.image, (current_tile_size, current_tile_size))
+                        elif not can_move:
+                            print('b')
                     elif event.key == pygame.K_RIGHT:
-                        if funcs.check_position("RIGHT", all_sprites, all_auras, mcf[1], (PLAYER_X, PLAYER_Y),
-                                                tile_size=current_tile_size) and can_move:
-                            all_sprites.update("RIGHT", current_tile_size, PLAYER_X, PLAYER_Y)
+                        if funcs.check_position("RIGHT", all_sprites, all_auras, mcf[1], current_position,
+                                                tile_size=current_tile_size) and (can_move or map_is_used):
+                            current_position[0] += 1
+                            '''all_sprites.update("RIGHT", current_tile_size, PLAYER_X, PLAYER_Y)
                             all_auras.update("RIGHT", current_tile_size, PLAYER_X, PLAYER_Y)
-                            all_grass.update("RIGHT", current_tile_size, PLAYER_X, PLAYER_Y)
+                            all_grass.update("RIGHT", current_tile_size, PLAYER_X, PLAYER_Y)'''
                             can_move = False
                             last_move_time = current_time
                             main_char.image = main_char.image_right
                             main_char.image = pygame.transform.scale(main_char.image, (current_tile_size, current_tile_size))
+                    all_sprites.update(current_position, all_rendered, rendered_grass, rendered_auras)
+                    all_auras.update(current_position, all_rendered, rendered_grass, rendered_auras)
+                    all_grass.update(current_position, all_rendered, rendered_grass, rendered_auras)
                 elif event.key == pygame.K_m and inventory[1].amount > 0 and not store_popup[0]: # pressing 'm' uses the map, making the render distance bigger for a limited duration
                     current_tile_size = int(INITIAL_TILE_SIZE / 2)
-                    all_sprites.update("", current_tile_size, PLAYER_X, PLAYER_Y, portal=False, map_use=True)
+                    '''all_sprites.update("", current_tile_size, PLAYER_X, PLAYER_Y, portal=False, map_use=True)
                     all_auras.update("", current_tile_size, PLAYER_X, PLAYER_Y, portal=False, map_use=True)
-                    all_grass.update("", current_tile_size, PLAYER_X, PLAYER_Y, portal=False, map_use=True)
+                    all_grass.update("", current_tile_size, PLAYER_X, PLAYER_Y, portal=False, map_use=True)'''
+                    all_sprites.update(current_position, all_rendered, rendered_grass, rendered_auras, map_use=True)
+                    all_auras.update(current_position, all_rendered, rendered_grass, rendered_auras, map_use=True)
+                    all_grass.update(current_position, all_rendered, rendered_grass, rendered_auras, map_use=True)
                     main_chars.update(True, False)
                     last_map_use = current_time
                     map_is_used = True
                     inventory[1].amount -= 1
                 elif event.key == pygame.K_c and inventory[3].amount > 0 and boxes and not store_popup[0]: # pressing 'c' uses the compass, revealing the closest box if there's any
-                    closest_box = funcs.find_closest_box(boxes, PLAYER_X, PLAYER_Y)
+                    closest_box = funcs.find_closest_box(boxes, PLAYER_X, PLAYER_Y, current_position)
                     direction = ''
                     arrow_position = [0, 0]
                     if closest_box.rect.y < PLAYER_Y:
@@ -224,9 +245,10 @@ def game_loop():
                     elif closest_box.rect.x > PLAYER_X:
                         direction += 'r'
                         arrow_position[0] += 1
-                    arrow = objects.CompassArrow(PLAYER_X + current_tile_size * arrow_position[0],
+                    '''arrow = objects.CompassArrow(PLAYER_X + current_tile_size * arrow_position[0],
                                                  PLAYER_Y + current_tile_size * arrow_position[1], current_tile_size,
-                                                 current_tile_size)
+                                                 current_tile_size)'''
+                    arrow = objects.CompassArrow((current_position[0] + arrow_position[0], current_position[1] + arrow_position[1]), current_tile_size, current_tile_size)
                     arrow.change_arrow(direction)
                     arrow_shown = True
                     inventory[3].amount -= 1
@@ -289,15 +311,18 @@ def game_loop():
             screen.fill(BLACK)
             popup_details = [False,
                              None]  # a list to pass by reference if a popup window is needed [0] and the popup image [1]
-            for sprite in all_sprites: # a loop for checking whether the player is near an interactable map object (s.a. a box or a gate)
+            for sprite in all_rendered: # a loop for checking whether the player is near an interactable map object (s.a. a box or a gate)
                 if sprite.near_main is True:
-                    funcs.check_action(popup_details, sprite, all_sprites, all_auras, all_grass, mcf, inventory, current_tile_size,
-                                       (PLAYER_X, PLAYER_Y), boxes, store_popup)
+                    funcs.check_action(popup_details, sprite, all_sprites, all_auras, all_grass, all_rendered, all_grass, all_auras, mcf, inventory, current_tile_size,
+                                       (PLAYER_X, PLAYER_Y), boxes, store_popup, current_position)
                     shoes_cooldown = COOLDOWN_WITHOUT_SHOES / (2 ** inventory[0].amount)
             # draws all the objects onto the screen
-            all_grass.draw(screen)
+            '''all_grass.draw(screen)
             all_auras.draw(screen)
-            all_sprites.draw(screen)
+            all_sprites.draw(screen)'''
+            rendered_grass.draw(screen)
+            rendered_auras.draw(screen)
+            all_rendered.draw(screen)
             main_chars.draw(screen)
             if arrow_shown:
                 screen.blit(arrow.image, arrow.rect)
@@ -337,14 +362,17 @@ def game_loop():
         if map_is_used and current_time - last_map_use > MAP_COOLDOWN:
             map_is_used = False
             current_tile_size *= 2
-            all_sprites.update("", current_tile_size, PLAYER_X, PLAYER_Y, portal=False, map_end=True)
+            '''all_sprites.update("", current_tile_size, PLAYER_X, PLAYER_Y, portal=False, map_end=True)
             all_grass.update("", current_tile_size, PLAYER_X, PLAYER_Y, portal=False, map_end=True)
-            all_auras.update("", current_tile_size, PLAYER_X, PLAYER_Y, portal=False, map_end=True)
+            all_auras.update("", current_tile_size, PLAYER_X, PLAYER_Y, portal=False, map_end=True)'''
+            all_sprites.update(current_position, all_rendered, rendered_grass, rendered_auras, map_end=True)
+            all_grass.update(current_position, all_rendered, rendered_grass, rendered_auras, map_end=True)
+            all_auras.update(current_position, all_rendered, rendered_grass, rendered_auras, map_end=True)
             main_chars.update(False, True)
-        clock.tick(60)
+        clock.tick(70)
 
 
 if __name__ == "__main__":
-    ble_thread = threading.Thread(target=ble_connection.start_ble_thread(), daemon=True)
-    ble_thread.start()
+    # ble_thread = threading.Thread(target=ble_connection.start_ble_thread(), daemon=True)
+    # ble_thread.start()
     game_loop()

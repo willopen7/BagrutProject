@@ -6,12 +6,13 @@ import asyncio
 import aioble
 import bluetooth
 import struct
-from machine import Pin
+from machine import Pin, UART
 from random import randint
+from brain import Brain
 
 # Init LED
-led = Pin(2, Pin.OUT)
-led.value(0)
+# led = Pin(2, Pin.OUT)
+# led.value(0)
 
 # Init random value
 value = 0
@@ -19,14 +20,18 @@ value = 0
 # See the following for generating UUIDs:
 # https://www.uuidgenerator.net/
 _BLE_SERVICE_UUID = bluetooth.UUID('19b10000-e8f2-537e-4f6c-d104768a1214')
-_BLE_SENSOR_CHAR_UUID = bluetooth.UUID('19b10001-e8f2-537e-4f6c-d104768a1214')
+_BLE_FOCUS_CHAR_UUID =bluetooth.UUID('1a9fa98f-45ae-4453-b95f-08cb978aa29d')
+_BLE_CALM_CHAR_UUID = bluetooth.UUID('19b10001-e8f2-537e-4f6c-d104768a1214')
 _BLE_LED_UUID = bluetooth.UUID('19b10002-e8f2-537e-4f6c-d104768a1214')
 # How frequently to send advertising beacons.
 _ADV_INTERVAL_MS = 250_000
 
+brain_module = Brain(2)
+
 # Register GATT server, the service and characteristics
 ble_service = aioble.Service(_BLE_SERVICE_UUID)
-sensor_characteristic = aioble.Characteristic(ble_service, _BLE_SENSOR_CHAR_UUID, read=True, notify=True)
+focus_characteristic = aioble.Characteristic(ble_service, _BLE_FOCUS_CHAR_UUID, read=True, notify=True)
+calm_characteristic = aioble.Characteristic(ble_service, _BLE_CALM_CHAR_UUID, read=True, notify=True)
 led_characteristic = aioble.Characteristic(ble_service, _BLE_LED_UUID, read=True, write=True, notify=True, capture=True)
 
 # Register service(s)
@@ -54,9 +59,12 @@ def get_random_value():
 # Get new value and update characteristic
 async def sensor_task():
     while True:
-        value = get_random_value()
-        sensor_characteristic.write(_encode_data(value), send_update=True)
-        print('New random value written: ', value)
+        print(brain_module.read_errors())
+        print('printed')
+        print('All stats: '+ brain_module.read_csv())
+        focus_characteristic.write(_encode_data(brain_module.read_attention()), send_update=True)
+        calm_characteristic.write(_encode_data(brain_module.read_meditation()), send_update=True)
+        print('Written!')
         await asyncio.sleep_ms(1000)
         
 # Serially wait for connections. Don't advertise while a central is connected.
