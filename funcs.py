@@ -48,10 +48,12 @@ def check_action(popup_details, sprite, all_sprites, all_auras, all_grass, all_r
         store_popup[0] = True
     if sprite.__class__ == objects.Gate and inventory[2].amount > 0:
         all_sprites.remove(sprite)
+        all_rendered.remove(sprite)
         inventory[2].amount -= 1
     if sprite.__class__ == objects.Fountain:
         mcf[0] += int((mcf[1] + mcf[2]) / 2)
         all_sprites.remove(sprite)
+        all_rendered.remove(sprite)
     if sprite.__class__ == objects.Portal:
         current_position[0] += sprite.distance_x
         current_position[1] += sprite.distance_y

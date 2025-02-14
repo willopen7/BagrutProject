@@ -31,6 +31,7 @@ class MapObj(pygame.sprite.Sprite): # a super class for all the map objects
         self.path = path
         self.image = pygame.image.load(path)
         self.image = pygame.transform.scale(self.image, (width, height))
+        self.image_normal = self.image.copy()
         self.original_size = (width, height)
         self.rect = self.image.get_rect()
         self.near_main = False
@@ -41,7 +42,7 @@ class MapObj(pygame.sprite.Sprite): # a super class for all the map objects
     def update(self, main_position, all_rendered, rendered_grass, rendered_auras, map_use=False, map_end=False):
         height = SCREEN_HEIGHT // TILE_SIZE
         width = SCREEN_WIDTH // TILE_SIZE
-        self.rect.x = MAIN_CHAR_RENDERED_POS[0] + (self.obj_position[0]-main_position[0])*TILE_SIZE
+        self.rect.x = MAIN_CHAR_RENDERED_POS[0] + (self.obj_position[0] - main_position[0])*TILE_SIZE
         self.rect.y = MAIN_CHAR_RENDERED_POS[1] + (self.obj_position[1] - main_position[1]) * TILE_SIZE
         if map_use or self.map_use:
             self.map_use = True
@@ -55,6 +56,7 @@ class MapObj(pygame.sprite.Sprite): # a super class for all the map objects
             self.map_use = False
             self.rect.x = self.rect.x * 2 - MAIN_CHAR_RENDERED_POS[0]
             self.rect.y = self.rect.y * 2 - MAIN_CHAR_RENDERED_POS[1]
+            self.image = self.image_normal.copy()
         if main_position[0] - width//2 <= self.obj_position[0] <= main_position[0] + width//2 and main_position[1] - height//2 <= self.obj_position[1] <= main_position[1] + height//2:
             if not self.is_shown:
                 if self.__class__ == objects.Grass:
@@ -111,16 +113,13 @@ class Box(MapObj): # class of boxes/chests
     def __init__(self, obj_position, width, height):
         super().__init__(obj_position, width, height, BOX_PATH)
         self.opened = False
+        self.opened_image = pygame.transform.scale(pygame.image.load(OPEN_BOX_PATH), self.original_size)
 
     def update(self, main_position, all_rendered, rendered_grass, rendered_auras, map_use=False, map_end=False):
         super().update(main_position, all_rendered, rendered_grass, rendered_auras, map_use, map_end)
         if map_end:
             if self.opened:
-                self.image = pygame.transform.scale(pygame.image.load(OPEN_BOX_PATH),
-                                                    (self.image.get_width() * 2, self.image.get_height() * 2))
-            else:
-                self.image = pygame.transform.scale(pygame.image.load(BOX_PATH),
-                                                    (self.image.get_width() * 2, self.image.get_height() * 2))
+                self.image = self.opened_image
 
 
 '''    def update(self, direct, size, player_x, player_y, portal=False, portal_properties=None, map_use=False, map_end=False):
@@ -163,9 +162,9 @@ class Store(MapObj):
 
     def update(self, main_position, all_rendered, rendered_grass, rendered_auras, map_use=False, map_end=False):
         super().update(main_position, all_rendered, rendered_grass, rendered_auras, map_use, map_end)
-        if map_end:
+        '''if map_end:
             self.image = pygame.transform.scale(pygame.image.load(STORE_PATH),
-                                                (self.image.get_width() * 2, self.image.get_height() * 2))
+                                                (self.image.get_width() * 2, self.image.get_height() * 2))'''
 
 
 class Wall(MapObj): # a class for the map borders or walls
@@ -193,9 +192,9 @@ class Wall(MapObj): # a class for the map borders or walls
 
     def update(self, main_position, all_rendered, rendered_grass, rendered_auras, map_use=False, map_end=False):
         super().update(main_position, all_rendered, rendered_grass, rendered_auras, map_use, map_end)
-        if map_end:
+        '''if map_end:
             self.image = pygame.transform.scale(pygame.image.load(WALL_PATH),
-                                                (self.image.get_width() * 2, self.image.get_height() * 2))
+                                                (self.image.get_width() * 2, self.image.get_height() * 2))'''
 
 
 class Gate(MapObj):
@@ -223,9 +222,9 @@ class Gate(MapObj):
 
     def update(self, main_position, all_rendered, rendered_grass, rendered_auras, map_use=False, map_end=False):
         super().update(main_position, all_rendered, rendered_grass, rendered_auras, map_use, map_end)
-        if map_end:
+        '''if map_end:
             self.image = pygame.transform.scale(pygame.image.load(GATE_PATH),
-                                                (self.image.get_width() * 2, self.image.get_height() * 2))
+                                                (self.image.get_width() * 2, self.image.get_height() * 2))'''
 
 
 class Monk(MapObj):
@@ -265,9 +264,9 @@ class Monk(MapObj):
 
     def update(self, main_position, all_rendered, rendered_grass, rendered_auras, map_use=False, map_end=False):
         super().update(main_position, all_rendered, rendered_grass, rendered_auras, map_use, map_end)
-        if map_end:
+        '''if map_end:
             self.image = pygame.transform.scale(pygame.image.load(MONK_PATH),
-                                                (self.image.get_width() * 2, self.image.get_height() * 2))
+                                                (self.image.get_width() * 2, self.image.get_height() * 2))'''
 
 
 class MonkAura(MapObj):
@@ -299,9 +298,9 @@ class MonkAura(MapObj):
 
     def update(self, main_position, all_rendered, rendered_grass, rendered_auras, map_use=False, map_end=False):
         super().update(main_position, all_rendered, rendered_grass, rendered_auras, map_use, map_end)
-        if map_end:
+        '''if map_end:
             self.image = pygame.transform.scale(pygame.image.load(MONK_AURA_PATH),
-                                                (self.image.get_width() * 2, self.image.get_height() * 2))
+                                                (self.image.get_width() * 2, self.image.get_height() * 2))'''
 
 
 class Fountain(MapObj):
@@ -329,9 +328,9 @@ class Fountain(MapObj):
 
     def update(self, main_position, all_rendered, rendered_grass, rendered_auras, map_use=False, map_end=False):
         super().update(main_position, all_rendered, rendered_grass, rendered_auras, map_use, map_end)
-        if map_end:
+        '''if map_end:
             self.image = pygame.transform.scale(pygame.image.load(FOUNTAIN_PATH),
-                                                (self.image.get_width() * 2, self.image.get_height() * 2))
+                                                (self.image.get_width() * 2, self.image.get_height() * 2))'''
 
 
 class Portal(MapObj):
@@ -367,9 +366,9 @@ class Portal(MapObj):
 
     def update(self, main_position, all_rendered, rendered_grass, rendered_auras, map_use=False, map_end=False):
         super().update(main_position, all_rendered, rendered_grass, rendered_auras, map_use, map_end)
-        if map_end:
+        '''if map_end:
             self.image = pygame.transform.scale(pygame.image.load(PORTAL_PATH),
-                                                (self.image.get_width() * 2, self.image.get_height() * 2))
+                                                (self.image.get_width() * 2, self.image.get_height() * 2))'''
 
 
 class MainChar(pygame.sprite.Sprite): # a class for the main character
@@ -477,6 +476,6 @@ class Grass(MapObj):
 
     def update(self, main_position, all_rendered, rendered_grass, rendered_auras, map_use=False, map_end=False):
         super().update(main_position, all_rendered, rendered_grass, rendered_auras, map_use, map_end)
-        if map_end:
+        '''if map_end:
             self.image = pygame.transform.scale(pygame.image.load(GRASS_PATH),
-                                                (self.image.get_width() * 2, self.image.get_height() * 2))
+                                                (self.image.get_width() * 2, self.image.get_height() * 2))'''

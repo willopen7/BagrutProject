@@ -159,6 +159,12 @@ def game_loop():
                                      INITIAL_TILE_SIZE)
         inventory_slots.add(slot)
         inventory_slots.add(inventory[i])
+    all_sprites.update(current_position, all_rendered, rendered_grass, rendered_auras)
+    all_grass.update(current_position, all_rendered, rendered_grass, rendered_auras)
+    all_auras.update(current_position, all_rendered, rendered_grass, rendered_auras)
+    all_rendered.draw(screen)
+    rendered_grass.draw(screen)
+    rendered_auras.draw(screen)
     while running: # an infinite loop for keeping the game running
         current_time = pygame.time.get_ticks()
         for event in pygame.event.get(): # a loop for all the events (mouse movement, key press etc.) that are happening
@@ -189,10 +195,8 @@ def game_loop():
                             can_move = False
                             last_move_time = current_time
                     elif event.key == pygame.K_LEFT:
-                        print('c')
                         if funcs.check_position("LEFT", all_sprites, all_auras, mcf[1], current_position,
                                                 tile_size=current_tile_size) and (can_move or map_is_used):
-                            print('a')
                             current_position[0] -= 1
                             '''all_sprites.update("LEFT", current_tile_size, PLAYER_X, PLAYER_Y)
                             all_auras.update("LEFT", current_tile_size, PLAYER_X, PLAYER_Y)
@@ -201,8 +205,6 @@ def game_loop():
                             last_move_time = current_time
                             main_char.image = main_char.image_left
                             main_char.image = pygame.transform.scale(main_char.image, (current_tile_size, current_tile_size))
-                        elif not can_move:
-                            print('b')
                     elif event.key == pygame.K_RIGHT:
                         if funcs.check_position("RIGHT", all_sprites, all_auras, mcf[1], current_position,
                                                 tile_size=current_tile_size) and (can_move or map_is_used):
@@ -325,6 +327,8 @@ def game_loop():
             all_rendered.draw(screen)
             main_chars.draw(screen)
             if arrow_shown:
+                arrow.rect.x = PLAYER_X + (arrow.obj_position[0] - current_position[0])*current_tile_size
+                arrow.rect.y = PLAYER_Y + (arrow.obj_position[1] - current_position[1]) * current_tile_size
                 screen.blit(arrow.image, arrow.rect)
             if popup_details[0]:
                 screen.blit(popup_details[1], (0, 0))
