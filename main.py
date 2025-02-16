@@ -75,7 +75,7 @@ def game_loop():
     arrow_shown = False
     store_popup = [False]  # a list for passing by reference if a store is opened
     not_enough_money = False
-    current_position = [15, 3]
+    current_position = [75, 48]
     types_of_blocks = {'0': objects.Grass, '1': objects.Wall, '2': objects.Box, '3': objects.Fountain,
                        '4': objects.Store, '5': objects.Box, '6': objects.Gate, '7': objects.Monk}
 
@@ -150,6 +150,7 @@ def game_loop():
     funcs.place_map_object_binary(all_sprites, objects.Wall, portal_walls, (15, 1), (PLAYER_X, PLAYER_Y),
                                   INITIAL_TILE_SIZE)'''
     map_coords = funcs.generate_map_txt(types_of_blocks, 'map.txt', INITIAL_TILE_SIZE, current_position, all_sprites, all_grass, all_auras, boxes=boxes)
+    funcs.create_portals(all_sprites)
     main_char = objects.MainChar(PLAYER_X, PLAYER_Y, INITIAL_TILE_SIZE, INITIAL_TILE_SIZE)
     main_chars = pygame.sprite.Group()
     main_chars.add(main_char)
@@ -315,7 +316,7 @@ def game_loop():
                              None]  # a list to pass by reference if a popup window is needed [0] and the popup image [1]
             for sprite in all_rendered: # a loop for checking whether the player is near an interactable map object (s.a. a box or a gate)
                 if sprite.near_main is True:
-                    funcs.check_action(popup_details, sprite, all_sprites, all_auras, all_grass, all_rendered, all_grass, all_auras, mcf, inventory, current_tile_size,
+                    funcs.check_action(popup_details, sprite, all_sprites, all_auras, all_grass, all_rendered, rendered_grass, rendered_auras, mcf, inventory, current_tile_size,
                                        (PLAYER_X, PLAYER_Y), boxes, store_popup, current_position)
                     shoes_cooldown = COOLDOWN_WITHOUT_SHOES / (2 ** inventory[0].amount)
             # draws all the objects onto the screen

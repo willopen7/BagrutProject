@@ -344,10 +344,10 @@ class Portal(MapObj):
         self.distance_x = distance_x
         self.distance_y = distance_y'''
 
-    def __init__(self, obj_position, width, height, distance_x, distance_y):
+    def __init__(self, obj_position, width, height, position_to_tranfer):
         super().__init__(obj_position, width, height, PORTAL_PATH)
-        self.distance_x = distance_x
-        self.distance_y = distance_y
+        self.distance_x = position_to_tranfer[0] - obj_position[0]
+        self.distance_y = position_to_tranfer[1] - obj_position[1]
 
     '''def update(self, direct, size, player_x, player_y, portal=False, portal_properties=None, map_use=False, map_end=False):
         super().update(direct, size, player_x, player_y, portal, portal_properties)

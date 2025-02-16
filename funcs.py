@@ -54,12 +54,12 @@ def check_action(popup_details, sprite, all_sprites, all_auras, all_grass, all_r
         mcf[0] += int((mcf[1] + mcf[2]) / 2)
         all_sprites.remove(sprite)
         all_rendered.remove(sprite)
-    if sprite.__class__ == objects.Portal:
+    if sprite.__class__ == objects.Portal and current_position[0] == sprite.obj_position[0] and current_position[1] == sprite.obj_position[1]:
         current_position[0] += sprite.distance_x
         current_position[1] += sprite.distance_y
-        all_sprites.update(current_position, all_rendered, rendered_grass, rendered_auras)
         all_grass.update(current_position, all_rendered, rendered_grass, rendered_auras)
         all_auras.update(current_position, all_rendered, rendered_grass, rendered_auras)
+        all_sprites.update(current_position, all_rendered, rendered_grass, rendered_auras)
         '''all_sprites.update("", tile_size, player_pos[0], player_pos[1], portal=True,
                            portal_properties=(sprite.distance_x, sprite.distance_y))
         all_auras.update("", tile_size, player_pos[0], player_pos[1], portal=True,
@@ -149,3 +149,9 @@ def generate_map_txt(types_of_blocks: dict, coordinates, tile_size, start_point,
                         all_auras.add(cur_obj.monk_auras)
     return map_blocks
 
+
+def create_portals(all_sprites):
+    portals = [((72, 51), (62, 7)), ((43, 21), (72, 33)), ((74, 33), (49, 25)), ((43, 42), (10, 35)), ((11, 35), (40, 45))]
+    for p in range(len(portals)):
+        cur_obj = objects.Portal(portals[p][0], 80, 80, portals[p][1])
+        all_sprites.add(cur_obj)
