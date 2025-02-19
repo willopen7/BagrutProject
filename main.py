@@ -186,6 +186,8 @@ def game_loop():
                             all_grass.update("UP", current_tile_size, PLAYER_X, PLAYER_Y)'''
                             can_move = False
                             last_move_time = current_time
+                            main_char.image = main_char.image_back
+                            main_char.image = pygame.transform.scale(main_char.image, (current_tile_size, current_tile_size))
                     elif event.key == pygame.K_DOWN:
                         if funcs.check_position("DOWN", all_sprites, all_auras, mcf[1], current_position,
                                                 tile_size=current_tile_size) and (can_move or map_is_used):
@@ -195,6 +197,8 @@ def game_loop():
                             all_grass.update("DOWN", current_tile_size, PLAYER_X, PLAYER_Y)'''
                             can_move = False
                             last_move_time = current_time
+                            main_char.image = main_char.image_front
+                            main_char.image = pygame.transform.scale(main_char.image, (current_tile_size, current_tile_size))
                     elif event.key == pygame.K_LEFT:
                         if funcs.check_position("LEFT", all_sprites, all_auras, mcf[1], current_position,
                                                 tile_size=current_tile_size) and (can_move or map_is_used):

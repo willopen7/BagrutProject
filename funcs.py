@@ -9,7 +9,7 @@ MEDIUM_MONEY = 10
 BIG_MONEY = 15
 HUGE_MONEY = 30
 OPEN_BOX_PATH = "icons\\opened-box.png"
-STORE_IN_GAME_PATH = "icons\\store_in_game.png"
+STORE_IN_GAME_PATH = "icons\\store_in_game2.png"
 types_of_blocks = {'0': objects.Grass, '1': objects.Wall, '2': objects.Box, '3': objects.Fountain, '4': objects.Store, '5': objects.Box, '6': objects.Gate, '7': objects.Monk}
 
 

@@ -14,7 +14,9 @@ GATE_PATH = "icons\\gate.png"
 FOUNTAIN_PATH = "icons\\fountain.png"
 GRASS_PATH = "icons\\grass.jpg"
 INVENTORY_SLOT_PATH = "icons\\InventorySlot.png"
-MAIN_CHAR_PATH = "icons\\main_char.png"
+MAIN_CHAR_PATH = "icons\\main_char-new.png"
+MAIN_CHAR_FRONT_PATH = "icons\\main_char-front.png"
+MAIN_CHAR_BACK_PATH = "icons\\main_char-back.png"
 MONK_PATH = "icons\\monk.png"
 MONK_AURA_PATH = "icons\\monk-aura.jpg"
 STORE_PATH = "icons\\store.png"
@@ -376,6 +378,8 @@ class MainChar(pygame.sprite.Sprite): # a class for the main character
         super().__init__()
         self.image_right = pygame.image.load(MAIN_CHAR_PATH)
         self.image_left = pygame.transform.flip(self.image_right, True, False)
+        self.image_front = pygame.image.load(MAIN_CHAR_FRONT_PATH)
+        self.image_back = pygame.image.load(MAIN_CHAR_BACK_PATH)
         self.image = self.image_right
         self.image = pygame.transform.scale(self.image, (width, height))
         self.rect = self.image.get_rect()
