@@ -9,6 +9,9 @@ SCREEN_HEIGHT = 880
 SCREEN_WIDTH = 880
 BOX_PATH = "icons\\closed-box.png"
 OPEN_BOX_PATH = "icons\\opened-box.png"
+SPECIAL_BOX_PATH = "icons\\special_box_close.png"
+SPECIAL_OPEN_BOX_PATH = "icons\\special_box_open.png"
+END_GATE_PATH = "icons\\end_gate.png"
 PORTAL_PATH = "icons\\portal.webp"
 GATE_PATH = "icons\\gate.png"
 FOUNTAIN_PATH = "icons\\fountain.png"
@@ -139,14 +142,35 @@ class Box(MapObj): # class of boxes/chests
                 self.image = pygame.transform.scale(pygame.image.load(BOX_PATH), (self.image.get_width() * 2, self.image.get_height() * 2))'''
 
 
+class SpecialBox(MapObj):
+    def __init__(self, obj_position, width, height):
+        super().__init__(obj_position, width, height, SPECIAL_BOX_PATH)
+        self.opened = False
+        self.opened_image = pygame.transform.scale(pygame.image.load(SPECIAL_OPEN_BOX_PATH), self.original_size)
+
+    def update(self, main_position, all_rendered, rendered_grass, rendered_auras, map_use=False, map_end=False):
+        super().update(main_position, all_rendered, rendered_grass, rendered_auras, map_use, map_end)
+        if map_end:
+            if self.opened:
+                self.image = self.opened_image
+
+
+class EndGate(MapObj):
+    def __init__(self, obj_position, width, height):
+        super().__init__(obj_position, width, height, END_GATE_PATH)
+
+    def update(self, main_position, all_rendered, rendered_grass, rendered_auras, map_use=False, map_end=False):
+        super().update(main_position, all_rendered, rendered_grass, rendered_auras, map_use, map_end)
+
+
 class Store(MapObj):
-    '''def __init__(self, x, y, width, height):
+    """def __init__(self, x, y, width, height):
         super().__init__()
         self.image = pygame.image.load(STORE_PATH)
         self.image = pygame.transform.scale(self.image, (width, height))
         self.rect = self.image.get_rect()
         self.rect.x = x
-        self.rect.y = y'''
+        self.rect.y = y"""
 
     def __init__(self, obj_position, width, height):
         super().__init__(obj_position, width, height, STORE_PATH)

@@ -9,8 +9,9 @@ MEDIUM_MONEY = 10
 BIG_MONEY = 15
 HUGE_MONEY = 30
 OPEN_BOX_PATH = "icons\\opened-box.png"
-STORE_IN_GAME_PATH = "icons\\store_in_game2.png"
-types_of_blocks = {'0': objects.Grass, '1': objects.Wall, '2': objects.Box, '3': objects.Fountain, '4': objects.Store, '5': objects.Box, '6': objects.Gate, '7': objects.Monk}
+SPECIAL_OPEN_BOX_PATH = "icons\\special_box_open.png"
+STORE_IN_GAME_PATH = "icons\\store_in_game3.png"
+types_of_blocks = {'0': objects.Grass, '1': objects.Wall, '2': objects.Box, '3': objects.Fountain, '4': objects.Store, '5': objects.SpecialBox, '6': objects.Gate, '7': objects.Monk}
 
 
 def check_position(direction, sprites, auras, calm, current_position, player_pos=(400, 400),
@@ -60,6 +61,14 @@ def check_action(popup_details, sprite, all_sprites, all_auras, all_grass, all_r
         all_grass.update(current_position, all_rendered, rendered_grass, rendered_auras)
         all_auras.update(current_position, all_rendered, rendered_grass, rendered_auras)
         all_sprites.update(current_position, all_rendered, rendered_grass, rendered_auras)
+    if sprite.__class__ == objects.SpecialBox and not sprite.opened:
+        inventory[len(inventory)-1].amount += 1
+        sprite.image = pygame.transform.scale(pygame.image.load(SPECIAL_OPEN_BOX_PATH), (tile_size, tile_size))
+        sprite.opened = True
+    if sprite.__class__ == objects.EndGate and inventory[len(inventory)-1].amount >= 8:
+        all_sprites.remove(sprite)
+        all_rendered.remove(sprite)
+        inventory[len(inventory)-1].amount = 0
         '''all_sprites.update("", tile_size, player_pos[0], player_pos[1], portal=True,
                            portal_properties=(sprite.distance_x, sprite.distance_y))
         all_auras.update("", tile_size, player_pos[0], player_pos[1], portal=True,
@@ -136,6 +145,8 @@ def generate_map_txt(types_of_blocks: dict, coordinates, tile_size, start_point,
             map_blocks[i][-1] = map_blocks[i][-1][0]
         for i in range(len(map_blocks)):
             for j in range(len(map_blocks[i])):
+                if map_blocks[i][j] == '5':
+                    print('yo!')
                 if map_blocks[i][j] != '9':
                     cur_obj = types_of_blocks[map_blocks[i][j]]((j, i), tile_size, tile_size)
                     if types_of_blocks[map_blocks[i][j]] == objects.Grass:

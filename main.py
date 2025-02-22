@@ -40,6 +40,7 @@ def game_loop():
     COMPASS_IMAGE_PATH = "icons\\compass.png"
     CALM_POTION_PATH = "icons\\calm_potion.png"
     FOCUS_POTION_PATH = "icons\\focus_potion.png"
+    END_SHARD_PATH = "icons\\end_shard.png"
     ITEMS_PRICES = [15, 30, 30, 20, 10, 10] # [0] is shoes, [1] is map, [2] is key, [3] is compass, [4] is calm potion, [5] is focus potion
 
     # VARIABLES
@@ -58,7 +59,9 @@ def game_loop():
         objects.InventoryItem(INITIAL_TILE_SIZE * 4, SCREEN_HEIGHT - INITIAL_TILE_SIZE, INITIAL_TILE_SIZE,
                               INITIAL_TILE_SIZE, CALM_POTION_PATH),
         objects.InventoryItem(INITIAL_TILE_SIZE * 5, SCREEN_HEIGHT - INITIAL_TILE_SIZE, INITIAL_TILE_SIZE,
-                              INITIAL_TILE_SIZE, FOCUS_POTION_PATH)]
+                              INITIAL_TILE_SIZE, FOCUS_POTION_PATH),
+        objects.InventoryItem(INITIAL_TILE_SIZE * (SCREEN_WIDTH//INITIAL_TILE_SIZE-1), SCREEN_HEIGHT - INITIAL_TILE_SIZE, INITIAL_TILE_SIZE,
+                              INITIAL_TILE_SIZE, END_SHARD_PATH)]
     # [0] is shoes, [1] is map, [2] is key, [3] is compass, [4] is calm potion, [5] is focus potion
     NUM_SLOTS = len(inventory)
     can_move = True
@@ -77,7 +80,7 @@ def game_loop():
     not_enough_money = False
     current_position = [75, 48]
     types_of_blocks = {'0': objects.Grass, '1': objects.Wall, '2': objects.Box, '3': objects.Fountain,
-                       '4': objects.Store, '5': objects.Box, '6': objects.Gate, '7': objects.Monk}
+                       '4': objects.Store, '5': objects.SpecialBox, '6': objects.Gate, '7': objects.Monk}
 
     # pygame setup
     screen = pygame.display.set_mode((SCREEN_HEIGHT, SCREEN_WIDTH))
@@ -151,15 +154,21 @@ def game_loop():
                                   INITIAL_TILE_SIZE)'''
     map_coords = funcs.generate_map_txt(types_of_blocks, 'map.txt', INITIAL_TILE_SIZE, current_position, all_sprites, all_grass, all_auras, boxes=boxes)
     funcs.create_portals(all_sprites)
+    end_gate = objects.EndGate((17, 48), current_tile_size, current_tile_size)
+    all_sprites.add(end_gate)
     main_char = objects.MainChar(PLAYER_X, PLAYER_Y, INITIAL_TILE_SIZE, INITIAL_TILE_SIZE)
     main_chars = pygame.sprite.Group()
     main_chars.add(main_char)
     inventory_slots = pygame.sprite.Group()
-    for i in range(NUM_SLOTS):
+    for i in range(NUM_SLOTS-1):
         slot = objects.InventorySlot(INITIAL_TILE_SIZE * i, SCREEN_HEIGHT - INITIAL_TILE_SIZE, INITIAL_TILE_SIZE,
                                      INITIAL_TILE_SIZE)
         inventory_slots.add(slot)
         inventory_slots.add(inventory[i])
+    slot = objects.InventorySlot(INITIAL_TILE_SIZE * (SCREEN_WIDTH//INITIAL_TILE_SIZE-1), SCREEN_HEIGHT - INITIAL_TILE_SIZE, INITIAL_TILE_SIZE,
+                                     INITIAL_TILE_SIZE)
+    inventory_slots.add(slot)
+    inventory_slots.add(inventory[len(inventory)-1])
     all_sprites.update(current_position, all_rendered, rendered_grass, rendered_auras)
     all_grass.update(current_position, all_rendered, rendered_grass, rendered_auras)
     all_auras.update(current_position, all_rendered, rendered_grass, rendered_auras)
