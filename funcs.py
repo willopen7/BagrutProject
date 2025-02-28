@@ -10,7 +10,7 @@ BIG_MONEY = 15
 HUGE_MONEY = 30
 OPEN_BOX_PATH = "icons\\opened-box.png"
 SPECIAL_OPEN_BOX_PATH = "icons\\special_box_open.png"
-STORE_IN_GAME_PATH = "icons\\store_in_game3.png"
+STORE_IN_GAME_PATH = "icons\\store_in_game4.png"
 types_of_blocks = {'0': objects.Grass, '1': objects.Wall, '2': objects.Box, '3': objects.Fountain, '4': objects.Store, '5': objects.SpecialBox, '6': objects.Gate, '7': objects.Monk}
 
 
@@ -69,6 +69,8 @@ def check_action(popup_details, sprite, all_sprites, all_auras, all_grass, all_r
         all_sprites.remove(sprite)
         all_rendered.remove(sprite)
         inventory[len(inventory)-1].amount = 0
+    if sprite.__class__ == objects.EndPortal:
+        mcf[0] = -999
         '''all_sprites.update("", tile_size, player_pos[0], player_pos[1], portal=True,
                            portal_properties=(sprite.distance_x, sprite.distance_y))
         all_auras.update("", tile_size, player_pos[0], player_pos[1], portal=True,
@@ -78,27 +80,38 @@ def check_action(popup_details, sprite, all_sprites, all_auras, all_grass, all_r
 
 
 def open_box(inventory, mcf): # creates a random variable to decide the item the player recieves from a box
+    sum = 0
+    for i in range(6):
+        sum += (5 - inventory[i].amount)
     chance = random.randint(1, 100)
-    if chance > 95:
-        inventory[1].amount += 1  # player gets a map
-    elif chance > 85:
-        inventory[0].amount += 1  # player gets shoes
-    elif chance > 80:
-        inventory[2].amount += 1  # player gets a key
-    elif chance > 55:
+    print(chance)
+    if chance > 85:
         mcf[0] += SMALL_MONEY
-    elif chance > 45:
-        mcf[0] += MEDIUM_MONEY
-    elif chance > 40:
+    elif chance > 80:
         mcf[0] += BIG_MONEY
-    elif chance > 38:
+    elif chance > 72:
+        mcf[0] += MEDIUM_MONEY
+    elif chance > 70:
         mcf[0] += HUGE_MONEY
-    elif chance > 30:
-        inventory[3].amount += 1  # player gets a compass
-    elif chance > 15:
+    elif chance > 55:
+        inventory[0].amount += 1  # player gets shoes
+    elif chance > 45:
         inventory[4].amount += 1  # player gets a calm potion
-    else:
+    elif chance > 35:
         inventory[5].amount += 1  # player gets a focus potion
+    elif chance > 28:
+        inventory[3].amount += 1  # player gets a compass
+    elif chance > 22:
+        inventory[1].amount += 1  # player gets a map
+    elif chance > 15:
+        inventory[2].amount += 1  # player gets a key
+    elif inventory[0].amount >= 2 and chance > 7:
+        inventory[1].amount += 1  # player gets a map
+    elif inventory[0].amount >= 2:
+        inventory[2].amount += 1  # player gets a key
+    else:
+        inventory[0].amount += 1
+
 
 
 def find_closest_box(boxes, player_x, player_y, current_position): # a function for the compass object that finds the closest box to the player
@@ -149,7 +162,7 @@ def generate_map_txt(types_of_blocks: dict, coordinates, tile_size, start_point,
                     print('yo!')
                 if map_blocks[i][j] != '9':
                     cur_obj = types_of_blocks[map_blocks[i][j]]((j, i), tile_size, tile_size)
-                    if types_of_blocks[map_blocks[i][j]] == objects.Grass:
+                    if types_of_blocks[map_blocks[i][j]] == objects.Grass or types_of_blocks[map_blocks[i][j]] == objects.EndGrass:
                         all_grass.add(cur_obj)
                     else:
                         all_sprites.add(cur_obj)

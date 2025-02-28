@@ -12,10 +12,12 @@ OPEN_BOX_PATH = "icons\\opened-box.png"
 SPECIAL_BOX_PATH = "icons\\special_box_close.png"
 SPECIAL_OPEN_BOX_PATH = "icons\\special_box_open.png"
 END_GATE_PATH = "icons\\end_gate.png"
+END_PORTAL_PATH = "icons\\end_portal.png"
 PORTAL_PATH = "icons\\portal.webp"
 GATE_PATH = "icons\\gate.png"
 FOUNTAIN_PATH = "icons\\fountain.png"
 GRASS_PATH = "icons\\grass.jpg"
+END_GRASS_PATH = "icons\\end_grass2.png"
 INVENTORY_SLOT_PATH = "icons\\InventorySlot.png"
 MAIN_CHAR_PATH = "icons\\main_char-new.png"
 MAIN_CHAR_FRONT_PATH = "icons\\main_char-front.png"
@@ -64,7 +66,7 @@ class MapObj(pygame.sprite.Sprite): # a super class for all the map objects
             self.image = self.image_normal.copy()
         if main_position[0] - width//2 <= self.obj_position[0] <= main_position[0] + width//2 and main_position[1] - height//2 <= self.obj_position[1] <= main_position[1] + height//2:
             if not self.is_shown:
-                if self.__class__ == objects.Grass:
+                if self.__class__ == objects.Grass or self.__class__ == objects.EndGrass:
                     rendered_grass.add(self)
                 elif self.__class__ == objects.MonkAura:
                     rendered_auras.add(self)
@@ -72,7 +74,7 @@ class MapObj(pygame.sprite.Sprite): # a super class for all the map objects
                     all_rendered.add(self)
                 self.is_shown = True
         elif self.is_shown:
-            if self.__class__ == objects.Grass:
+            if self.__class__ == objects.Grass or self.__class__ == objects.EndGrass:
                 rendered_grass.remove(self)
             elif self.__class__ == objects.MonkAura:
                 rendered_auras.remove(self)
@@ -359,6 +361,14 @@ class Fountain(MapObj):
                                                 (self.image.get_width() * 2, self.image.get_height() * 2))'''
 
 
+class EndPortal(MapObj):
+    def __init__(self, obj_position, width, height):
+        super().__init__(obj_position, width, height, END_PORTAL_PATH)
+
+    def update(self, main_position, all_rendered, rendered_grass, rendered_auras, map_use=False, map_end=False):
+        super().update(main_position, all_rendered, rendered_grass, rendered_auras, map_use, map_end)
+
+
 class Portal(MapObj):
     '''def __init__(self, x, y, width, height, distance_x, distance_y):
         super().__init__()
@@ -474,6 +484,14 @@ class CompassArrow(MapObj):
 
     '''def update(self, direct, size, player_x, player_y, portal=False, portal_properties=None):
         super().update(direct, size, player_x, player_y, portal, portal_properties)'''
+
+    def update(self, main_position, all_rendered, rendered_grass, rendered_auras, map_use=False, map_end=False):
+        super().update(main_position, all_rendered, rendered_grass, rendered_auras, map_use, map_end)
+
+
+class EndGrass(MapObj):
+    def __init__(self, obj_position, width, height):
+        super().__init__(obj_position, width, height, END_GRASS_PATH)
 
     def update(self, main_position, all_rendered, rendered_grass, rendered_auras, map_use=False, map_end=False):
         super().update(main_position, all_rendered, rendered_grass, rendered_auras, map_use, map_end)

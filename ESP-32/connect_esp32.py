@@ -59,13 +59,21 @@ def get_random_value():
 # Get new value and update characteristic
 async def sensor_task():
     while True:
-        print(brain_module.read_errors())
+        brain_module.update()
+        print("Latest Byte:", brain_module.latest_byte)
+        print("Packet Data:", brain_module.packet_data)
+        print("Checksum Error:", brain_module.read_errors())
+        await asyncio.sleep_ms(500)
+        '''print(brain_module.read_errors())
         print('printed')
+        print("Signal Quality:", brain_module.read_signal_quality())
+        print("Errors:", brain_module.read_errors())
+        print("Raw EEG Data:", brain_module.read_power_array())
         print('All stats: '+ brain_module.read_csv())
         focus_characteristic.write(_encode_data(brain_module.read_attention()), send_update=True)
         calm_characteristic.write(_encode_data(brain_module.read_meditation()), send_update=True)
         print('Written!')
-        await asyncio.sleep_ms(1000)
+        await asyncio.sleep_ms(1000)'''
         
 # Serially wait for connections. Don't advertise while a central is connected.
 async def peripheral_task():
