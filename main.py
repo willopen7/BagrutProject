@@ -46,7 +46,8 @@ def game_loop():
     FOCUS_POTION_PATH = "icons\\focus_potion.png"
     END_SHARD_PATH = "icons\\end_shard.png"
     TOTAL_SHARDS = 8
-    ITEMS_PRICES = [15, 30, 30, 20, 10, 10] # [0] is shoes, [1] is map, [2] is key, [3] is compass, [4] is calm potion, [5] is focus potion
+    ITEMS_PRICES = [15, 30, 30, 20, 10,
+                    10]  # [0] is shoes, [1] is map, [2] is key, [3] is compass, [4] is calm potion, [5] is focus potion
 
     # VARIABLES
     mcf = [50, 50, 0]  # [0] is money, [1] is calm and [2] is focus
@@ -65,9 +66,11 @@ def game_loop():
                               INITIAL_TILE_SIZE, CALM_POTION_PATH),
         objects.InventoryItem(INITIAL_TILE_SIZE * 5, SCREEN_HEIGHT - INITIAL_TILE_SIZE, INITIAL_TILE_SIZE,
                               INITIAL_TILE_SIZE, FOCUS_POTION_PATH),
-        objects.InventoryItem(INITIAL_TILE_SIZE * (SCREEN_WIDTH//INITIAL_TILE_SIZE-1), SCREEN_HEIGHT - INITIAL_TILE_SIZE, INITIAL_TILE_SIZE,
+        objects.InventoryItem(INITIAL_TILE_SIZE * (SCREEN_WIDTH // INITIAL_TILE_SIZE - 1),
+                              SCREEN_HEIGHT - INITIAL_TILE_SIZE, INITIAL_TILE_SIZE,
                               INITIAL_TILE_SIZE, END_SHARD_PATH)]
     # [0] is shoes, [1] is map, [2] is key, [3] is compass, [4] is calm potion, [5] is focus potion
+    first_use = [True, True, True, True, True, True]
     NUM_SLOTS = len(inventory)
     can_move = True
     map_is_used = False
@@ -86,19 +89,31 @@ def game_loop():
     enough_money = False
     current_position = [75, 48]
     types_of_blocks = {'0': objects.Grass, '1': objects.Wall, '2': objects.Box, '3': objects.Fountain,
-                       '4': objects.Store, '5': objects.SpecialBox, '6': objects.Gate, '7': objects.Monk, '8': objects.EndGrass}
+                       '4': objects.Store, '5': objects.SpecialBox, '6': objects.Gate, '7': objects.Monk,
+                       '8': objects.EndGrass}
     opening_screen = True
     ending_screen = False
-    play_button_rect = pygame.Rect(INITIAL_TILE_SIZE*((SCREEN_WIDTH//INITIAL_TILE_SIZE)/2-1), INITIAL_TILE_SIZE*((SCREEN_HEIGHT//INITIAL_TILE_SIZE)/2-0.5), INITIAL_TILE_SIZE*2, INITIAL_TILE_SIZE)
-    play_text = FONT.render("PLAY", True, BLACK)
-    game_opening_text = FONT_STORE.render("MIND QUEST", True, WHITE)
-    game_ending_text = FONT_STORE.render("WELL DONE!", True, WHITE)
-    inventory[6].amount = 8
+    play_button_rect = pygame.Rect(INITIAL_TILE_SIZE * ((SCREEN_WIDTH // INITIAL_TILE_SIZE) / 2 - 1),
+                                   INITIAL_TILE_SIZE * ((SCREEN_HEIGHT // INITIAL_TILE_SIZE) / 2 - 0.5),
+                                   INITIAL_TILE_SIZE * 2, INITIAL_TILE_SIZE)
 
     # pygame setup
     screen = pygame.display.set_mode((SCREEN_HEIGHT, SCREEN_WIDTH))
     pygame.display.set_caption("Mind Quest")
     clock = pygame.time.Clock()
+
+    # TEXTS
+    play_text = FONT.render("PLAY", True, BLACK)
+    game_opening_text = FONT_STORE.render("MIND QUEST", True, WHITE)
+    game_ending_text = FONT_STORE.render("WELL DONE!", True, WHITE)
+    welcome_text = ["Welcome to Mind Quest!", "You found yourself trapped in this mysterious island", "and you have to find your way out", "", "", "Use the arrow keys to navigate"]
+    welcome_text_boxes = []
+    for i in range(len(welcome_text)):
+        welcome_text_boxes.append(objects.TextBox(FONT, welcome_text[i], (80, 180+FONT_SIZE*i), True, screen))
+    all_texts = pygame.sprite.Group()
+    for i in welcome_text_boxes:
+        all_texts.add(i)
+    message = [""]
 
     # map setup
     all_sprites = pygame.sprite.Group()
@@ -166,25 +181,27 @@ def game_loop():
                                   INITIAL_TILE_SIZE)
     funcs.place_map_object_binary(all_sprites, objects.Wall, portal_walls, (15, 1), (PLAYER_X, PLAYER_Y),
                                   INITIAL_TILE_SIZE)'''
-    map_coords = funcs.generate_map_txt(types_of_blocks, 'map.txt', INITIAL_TILE_SIZE, current_position, all_sprites, all_grass, all_auras, boxes=boxes)
+    map_coords = funcs.generate_map_txt(types_of_blocks, 'map.txt', INITIAL_TILE_SIZE, current_position, all_sprites,
+                                        all_grass, all_auras, boxes=boxes)
     funcs.create_portals(all_sprites)
     end_gate = objects.EndGate((17, 48), current_tile_size, current_tile_size)
     all_sprites.add(end_gate)
-    end_portal = objects.EndPortal((16, 49), current_tile_size*3, current_tile_size*3)
+    end_portal = objects.EndPortal((16, 49), current_tile_size * 3, current_tile_size * 3)
     all_sprites.add(end_portal)
     main_char = objects.MainChar(PLAYER_X, PLAYER_Y, INITIAL_TILE_SIZE, INITIAL_TILE_SIZE)
     main_chars = pygame.sprite.Group()
     main_chars.add(main_char)
     inventory_slots = pygame.sprite.Group()
-    for i in range(NUM_SLOTS-1):
+    for i in range(NUM_SLOTS - 1):
         slot = objects.InventorySlot(INITIAL_TILE_SIZE * i, SCREEN_HEIGHT - INITIAL_TILE_SIZE, INITIAL_TILE_SIZE,
                                      INITIAL_TILE_SIZE)
         inventory_slots.add(slot)
         inventory_slots.add(inventory[i])
-    slot = objects.InventorySlot(INITIAL_TILE_SIZE * (SCREEN_WIDTH//INITIAL_TILE_SIZE-1), SCREEN_HEIGHT - INITIAL_TILE_SIZE, INITIAL_TILE_SIZE,
-                                     INITIAL_TILE_SIZE)
+    slot = objects.InventorySlot(INITIAL_TILE_SIZE * (SCREEN_WIDTH // INITIAL_TILE_SIZE - 1),
+                                 SCREEN_HEIGHT - INITIAL_TILE_SIZE, INITIAL_TILE_SIZE,
+                                 INITIAL_TILE_SIZE)
     inventory_slots.add(slot)
-    inventory_slots.add(inventory[len(inventory)-1])
+    inventory_slots.add(inventory[len(inventory) - 1])
     all_sprites.update(current_position, all_rendered, rendered_grass, rendered_auras)
     all_grass.update(current_position, all_rendered, rendered_grass, rendered_auras)
     all_auras.update(current_position, all_rendered, rendered_grass, rendered_auras)
@@ -209,9 +226,9 @@ def game_loop():
                 opening_screen = False
         pygame.display.flip()
 
-    while running: # an infinite loop for keeping the game running
+    while running:  # an infinite loop for keeping the game running
         current_time = pygame.time.get_ticks()
-        for event in pygame.event.get(): # a loop for all the events (mouse movement, key press etc.) that are happening
+        for event in pygame.event.get():  # a loop for all the events (mouse movement, key press etc.) that are happening
             if event.type == pygame.QUIT:
                 running = False
             elif event.type == pygame.KEYDOWN:
@@ -221,6 +238,11 @@ def game_loop():
                     store_popup[0] = False
                     not_enough_money = False
                     enough_money = False
+                    for i in welcome_text_boxes:
+                        if i.rendered:
+                            i.rendered = False
+                    if message[0] != "":
+                        message[0] = ""
                     if event.key == pygame.K_UP:
                         if funcs.check_position("UP", all_sprites, all_auras, mcf[1], current_position,
                                                 tile_size=current_tile_size) and (can_move or map_is_used):
@@ -231,7 +253,8 @@ def game_loop():
                             can_move = False
                             last_move_time = current_time
                             main_char.image = main_char.image_back
-                            main_char.image = pygame.transform.scale(main_char.image, (current_tile_size, current_tile_size))
+                            main_char.image = pygame.transform.scale(main_char.image,
+                                                                     (current_tile_size, current_tile_size))
                     elif event.key == pygame.K_DOWN:
                         if funcs.check_position("DOWN", all_sprites, all_auras, mcf[1], current_position,
                                                 tile_size=current_tile_size) and (can_move or map_is_used):
@@ -242,7 +265,8 @@ def game_loop():
                             can_move = False
                             last_move_time = current_time
                             main_char.image = main_char.image_front
-                            main_char.image = pygame.transform.scale(main_char.image, (current_tile_size, current_tile_size))
+                            main_char.image = pygame.transform.scale(main_char.image,
+                                                                     (current_tile_size, current_tile_size))
                     elif event.key == pygame.K_LEFT:
                         if funcs.check_position("LEFT", all_sprites, all_auras, mcf[1], current_position,
                                                 tile_size=current_tile_size) and (can_move or map_is_used):
@@ -253,7 +277,8 @@ def game_loop():
                             can_move = False
                             last_move_time = current_time
                             main_char.image = main_char.image_left
-                            main_char.image = pygame.transform.scale(main_char.image, (current_tile_size, current_tile_size))
+                            main_char.image = pygame.transform.scale(main_char.image,
+                                                                     (current_tile_size, current_tile_size))
                     elif event.key == pygame.K_RIGHT:
                         if funcs.check_position("RIGHT", all_sprites, all_auras, mcf[1], current_position,
                                                 tile_size=current_tile_size) and (can_move or map_is_used):
@@ -264,11 +289,13 @@ def game_loop():
                             can_move = False
                             last_move_time = current_time
                             main_char.image = main_char.image_right
-                            main_char.image = pygame.transform.scale(main_char.image, (current_tile_size, current_tile_size))
+                            main_char.image = pygame.transform.scale(main_char.image,
+                                                                     (current_tile_size, current_tile_size))
                     all_sprites.update(current_position, all_rendered, rendered_grass, rendered_auras)
                     all_auras.update(current_position, all_rendered, rendered_grass, rendered_auras)
                     all_grass.update(current_position, all_rendered, rendered_grass, rendered_auras)
-                elif event.key == pygame.K_m and inventory[1].amount > 0 and not store_popup[0]: # pressing 'm' uses the map, making the render distance bigger for a limited duration
+                elif event.key == pygame.K_m and inventory[1].amount > 0 and not store_popup[
+                    0]:  # pressing 'm' uses the map, making the render distance bigger for a limited duration
                     current_tile_size = int(INITIAL_TILE_SIZE / 2)
                     '''all_sprites.update("", current_tile_size, PLAYER_X, PLAYER_Y, portal=False, map_use=True)
                     all_auras.update("", current_tile_size, PLAYER_X, PLAYER_Y, portal=False, map_use=True)
@@ -280,7 +307,8 @@ def game_loop():
                     last_map_use = current_time
                     map_is_used = True
                     inventory[1].amount -= 1
-                elif event.key == pygame.K_c and inventory[3].amount > 0 and boxes and not store_popup[0]: # pressing 'c' uses the compass, revealing the closest box if there's any
+                elif event.key == pygame.K_c and inventory[3].amount > 0 and boxes and not store_popup[
+                    0]:  # pressing 'c' uses the compass, revealing the closest box if there's any
                     closest_box = funcs.find_closest_box(boxes, PLAYER_X, PLAYER_Y, current_position)
                     direction = ''
                     arrow_position = [0, 0]
@@ -299,12 +327,15 @@ def game_loop():
                     '''arrow = objects.CompassArrow(PLAYER_X + current_tile_size * arrow_position[0],
                                                  PLAYER_Y + current_tile_size * arrow_position[1], current_tile_size,
                                                  current_tile_size)'''
-                    arrow = objects.CompassArrow((current_position[0] + arrow_position[0], current_position[1] + arrow_position[1]), current_tile_size, current_tile_size)
+                    arrow = objects.CompassArrow(
+                        (current_position[0] + arrow_position[0], current_position[1] + arrow_position[1]),
+                        current_tile_size, current_tile_size)
                     arrow.change_arrow(direction)
                     arrow_shown = True
                     inventory[3].amount -= 1
                 elif event.key == pygame.K_1 and (
-                        (inventory[4].amount > 0 and calm_potion_active is False) or store_popup[0]): # if store is opened pressing 1 will try to buy shoes, otherwise it uses a calm potion
+                        (inventory[4].amount > 0 and calm_potion_active is False) or store_popup[
+                    0]):  # if store is opened pressing 1 will try to buy shoes, otherwise it uses a calm potion
                     if store_popup[0]:
                         if mcf[0] >= ITEMS_PRICES[0]:
                             inventory[0].amount += 1
@@ -320,7 +351,8 @@ def game_loop():
                         mcf[1] += POTIONS_BOOST
                         inventory[4].amount -= 1
                 elif event.key == pygame.K_2 and (
-                        (inventory[5].amount > 0 and focus_potion_active is False) or store_popup[0]): # if store is opened pressing 2 will try to buy a map, otherwise it uses a focus potion
+                        (inventory[5].amount > 0 and focus_potion_active is False) or store_popup[
+                    0]):  # if store is opened pressing 2 will try to buy a map, otherwise it uses a focus potion
                     if store_popup[0]:
                         if mcf[0] >= ITEMS_PRICES[1]:
                             inventory[1].amount += 1
@@ -335,7 +367,7 @@ def game_loop():
                         last_focus_potion_use = current_time
                         mcf[2] += POTIONS_BOOST
                         inventory[5].amount -= 1
-                elif event.key == pygame.K_3 and store_popup[0]: # pressing 3 while the store is opened buys a key
+                elif event.key == pygame.K_3 and store_popup[0]:  # pressing 3 while the store is opened buys a key
                     if mcf[0] >= ITEMS_PRICES[2]:
                         inventory[2].amount += 1
                         mcf[0] -= ITEMS_PRICES[2]
@@ -344,7 +376,7 @@ def game_loop():
                     else:
                         not_enough_money = True
                         enough_money = False
-                elif event.key == pygame.K_4 and store_popup[0]: # pressing 4 while the store is opened buys a compass
+                elif event.key == pygame.K_4 and store_popup[0]:  # pressing 4 while the store is opened buys a compass
                     if mcf[0] >= ITEMS_PRICES[3]:
                         inventory[3].amount += 1
                         mcf[0] -= ITEMS_PRICES[3]
@@ -353,7 +385,8 @@ def game_loop():
                     else:
                         not_enough_money = True
                         enough_money = False
-                elif event.key == pygame.K_5 and store_popup[0]: # pressing 5 while the store is opened buys a calm potion
+                elif event.key == pygame.K_5 and store_popup[
+                    0]:  # pressing 5 while the store is opened buys a calm potion
                     if mcf[0] >= ITEMS_PRICES[4]:
                         inventory[4].amount += 1
                         mcf[0] -= ITEMS_PRICES[4]
@@ -362,7 +395,8 @@ def game_loop():
                     else:
                         not_enough_money = True
                         enough_money = False
-                elif event.key == pygame.K_6 and store_popup[0]: # pressing 6 while the store is opened buys a focus potion
+                elif event.key == pygame.K_6 and store_popup[
+                    0]:  # pressing 6 while the store is opened buys a focus potion
                     if mcf[0] >= ITEMS_PRICES[5]:
                         inventory[5].amount += 1
                         mcf[0] -= ITEMS_PRICES[5]
@@ -374,14 +408,14 @@ def game_loop():
             screen.fill(BLACK)
             popup_details = [False,
                              None]  # a list to pass by reference if a popup window is needed [0] and the popup image [1]
-            for sprite in all_rendered: # a loop for checking whether the player is near an interactable map object (s.a. a box or a gate)
+            for sprite in all_rendered:  # a loop for checking whether the player is near an interactable map object (s.a. a box or a gate)
                 if sprite.near_main is True:
-                    funcs.check_action(popup_details, sprite, all_sprites, all_auras, all_grass, all_rendered, rendered_grass, rendered_auras, mcf, inventory, current_tile_size,
-                                       (PLAYER_X, PLAYER_Y), boxes, store_popup, current_position)
+                    funcs.check_action(popup_details, sprite, all_sprites, all_auras, all_grass, all_rendered,
+                                       rendered_grass, rendered_auras, mcf, inventory, current_tile_size,
+                                       first_use, boxes, store_popup, current_position, message)
                     if mcf[0] == -999:
                         running = False
                         ending_screen = True
-                        print("cool!!!")
                     shoes_cooldown = COOLDOWN_WITHOUT_SHOES / (2 ** inventory[0].amount)
             # draws all the objects onto the screen
             '''all_grass.draw(screen)
@@ -392,7 +426,7 @@ def game_loop():
             all_rendered.draw(screen)
             main_chars.draw(screen)
             if arrow_shown:
-                arrow.rect.x = PLAYER_X + (arrow.obj_position[0] - current_position[0])*current_tile_size
+                arrow.rect.x = PLAYER_X + (arrow.obj_position[0] - current_position[0]) * current_tile_size
                 arrow.rect.y = PLAYER_Y + (arrow.obj_position[1] - current_position[1]) * current_tile_size
                 screen.blit(arrow.image, arrow.rect)
             if popup_details[0]:
@@ -402,8 +436,8 @@ def game_loop():
             inventory_text = FONT.render(f"Inventory:", True, WHITE)
             screen.blit(FONT.render(f"Money: ${mcf[0]}", True, WHITE), MONEY_POS)
             if not store_popup[0]:
-                screen.blit(FONT.render(f"Calm: {mcf[1]}", True, WHITE), (MONEY_POS[0], MONEY_POS[1]+FONT_SIZE))
-                screen.blit(FONT.render(f"focus: {mcf[2]}", True, WHITE), (MONEY_POS[0], MONEY_POS[1]+FONT_SIZE*2))
+                screen.blit(FONT.render(f"Calm: {mcf[1]}", True, WHITE), (MONEY_POS[0], MONEY_POS[1] + FONT_SIZE))
+                screen.blit(FONT.render(f"focus: {mcf[2]}", True, WHITE), (MONEY_POS[0], MONEY_POS[1] + FONT_SIZE * 2))
             else:
                 screen.blit(FONT.render(f"Money: ${mcf[0]}", True, BLACK), (10, 10))
                 inventory_text = FONT.render(f"Inventory:", True, BLACK)
@@ -414,15 +448,21 @@ def game_loop():
                 screen.blit(FONT.render(f"CALM POTION: ${ITEMS_PRICES[4]} (to buy press 5)", True, BLACK), (10, 160))
                 screen.blit(FONT.render(f"FOCUS POTION: ${ITEMS_PRICES[5]} (to buy press 6)", True, BLACK), (10, 180))'''
                 if not_enough_money:
-                    screen.blit(FONT_STORE.render(f"NOT ENOUGH MONEY", True, RED), (SCREEN_WIDTH/2-INITIAL_TILE_SIZE*2.25, SCREEN_HEIGHT-INITIAL_TILE_SIZE*1.75))
+                    screen.blit(FONT_STORE.render(f"NOT ENOUGH MONEY", True, RED),
+                                (SCREEN_WIDTH / 2 - INITIAL_TILE_SIZE * 2.25, SCREEN_HEIGHT - INITIAL_TILE_SIZE * 1.75))
                 if enough_money:
-                    screen.blit(FONT_STORE.render(f"PURCHASE COMPLETE", True, BLACK), (SCREEN_WIDTH/2-INITIAL_TILE_SIZE*2.4, SCREEN_HEIGHT-INITIAL_TILE_SIZE*1.75))
+                    screen.blit(FONT_STORE.render(f"PURCHASE COMPLETE", True, BLACK),
+                                (SCREEN_WIDTH / 2 - INITIAL_TILE_SIZE * 2.4, SCREEN_HEIGHT - INITIAL_TILE_SIZE * 1.75))
             screen.blit(inventory_text, INVENTORY_POS)
-            for i in range(len(inventory)-1):
+            for i in range(len(inventory) - 1):
                 count_item = FONT_INVENTORY.render(f"{inventory[i].amount}", True, BLACK)
                 screen.blit(count_item, (inventory[i].rect.x, inventory[i].rect.y))
-            count_item = FONT_INVENTORY.render(f"{inventory[len(inventory)-1].amount}/{TOTAL_SHARDS}", True, BLACK)
-            screen.blit(count_item, (inventory[len(inventory)-1].rect.x, inventory[len(inventory)-1].rect.y))
+            count_item = FONT_INVENTORY.render(f"{inventory[len(inventory) - 1].amount}/{TOTAL_SHARDS}", True, BLACK)
+            screen.blit(count_item, (inventory[len(inventory) - 1].rect.x, inventory[len(inventory) - 1].rect.y))
+            for text in all_texts:
+                if text.rendered:
+                    screen.blit(text.text, text.position)
+            screen.blit(FONT.render(message[0], True, WHITE), (160, 20))
             pygame.display.flip()
         # checks if the wear-off effects are still on and if not turns them off
         if calm_potion_active and current_time - last_calm_potion_use >= POTIONS_DURATION:
@@ -449,7 +489,6 @@ def game_loop():
         screen.fill(BLACK)
         screen.blit(game_ending_text, (330, 340))
         pygame.display.flip()
-
 
 
 if __name__ == "__main__":

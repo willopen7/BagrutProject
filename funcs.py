@@ -37,9 +37,9 @@ def check_position(direction, sprites, auras, calm, current_position, player_pos
     return True
 
 
-def check_action(popup_details, sprite, all_sprites, all_auras, all_grass, all_rendered, rendered_grass, rendered_auras, mcf, inventory, tile_size, player_pos, boxes, store_popup, current_position): # checks which class is a specific sprite which is near the player and acts correspondingly
+def check_action(popup_details, sprite, all_sprites, all_auras, all_grass, all_rendered, rendered_grass, rendered_auras, mcf, inventory, tile_size, first_use, boxes, store_popup, current_position, message): # checks which class is a specific sprite which is near the player and acts correspondingly
     if sprite.__class__ == objects.Box and sprite in boxes:
-        open_box(inventory, mcf)
+        open_box(inventory, mcf, first_use, message)
         boxes.remove(sprite)
         sprite.image = pygame.transform.scale(pygame.image.load(OPEN_BOX_PATH), (tile_size, tile_size))
         sprite.opened = True
@@ -65,6 +65,7 @@ def check_action(popup_details, sprite, all_sprites, all_auras, all_grass, all_r
         inventory[len(inventory)-1].amount += 1
         sprite.image = pygame.transform.scale(pygame.image.load(SPECIAL_OPEN_BOX_PATH), (tile_size, tile_size))
         sprite.opened = True
+        message[0] = "You got an end shard! You need to collect 8 to open the end gate"
     if sprite.__class__ == objects.EndGate and inventory[len(inventory)-1].amount >= 8:
         all_sprites.remove(sprite)
         all_rendered.remove(sprite)
@@ -79,7 +80,7 @@ def check_action(popup_details, sprite, all_sprites, all_auras, all_grass, all_r
                          portal_properties=(sprite.distance_x, sprite.distance_y))'''
 
 
-def open_box(inventory, mcf): # creates a random variable to decide the item the player recieves from a box
+def open_box(inventory, mcf, first_use, message): # creates a random variable to decide the item the player recieves from a box
     sum = 0
     for i in range(6):
         sum += (5 - inventory[i].amount)
@@ -95,22 +96,31 @@ def open_box(inventory, mcf): # creates a random variable to decide the item the
         mcf[0] += HUGE_MONEY
     elif chance > 55:
         inventory[0].amount += 1  # player gets shoes
+        message[0] = "You got shoes! These make you go faster"
     elif chance > 45:
         inventory[4].amount += 1  # player gets a calm potion
+        message[0] = "You got a calm potion! To boost your calm levels press 1"
     elif chance > 35:
         inventory[5].amount += 1  # player gets a focus potion
+        message[0] = "You got a focus potion! To boost your focus levels press 2"
     elif chance > 28:
         inventory[3].amount += 1  # player gets a compass
+        message[0] = "You got a compass! To find the nearest box press 'c'"
     elif chance > 22:
         inventory[1].amount += 1  # player gets a map
+        message[0] = "You got a map! To have a bigger render distance press 'm'"
     elif chance > 15:
         inventory[2].amount += 1  # player gets a key
+        message[0] = "You got a key! These help you open gates"
     elif inventory[0].amount >= 2 and chance > 7:
         inventory[1].amount += 1  # player gets a map
+        message[0] = "You got a map! To have a bigger render distance press 'm'"
     elif inventory[0].amount >= 2:
         inventory[2].amount += 1  # player gets a key
+        message[0] = "You got a key! These help you open gates"
     else:
         inventory[0].amount += 1
+        message[0] = "You got shoes! These make you go faster"
 
 
 

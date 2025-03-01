@@ -30,8 +30,11 @@ class Brain:
 
     def update(self):
         parse_return = 0
+        print("here")
         if self.uart.any():
+            print("UART Data Available")
             self.latest_byte = self.uart.read(1)[0]
+            print("Latest Byte Read:", self.latest_byte)
 
             # Build a packet
             if self.in_packet:

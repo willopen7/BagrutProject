@@ -60,9 +60,7 @@ def get_random_value():
 async def sensor_task():
     while True:
         brain_module.update()
-        print("Latest Byte:", brain_module.latest_byte)
-        print("Packet Data:", brain_module.packet_data)
-        print("Checksum Error:", brain_module.read_errors())
+        print("UART any():", brain_module.uart.any())
         await asyncio.sleep_ms(500)
         '''print(brain_module.read_errors())
         print('printed')

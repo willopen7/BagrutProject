@@ -525,3 +525,24 @@ class Grass(MapObj):
         '''if map_end:
             self.image = pygame.transform.scale(pygame.image.load(GRASS_PATH),
                                                 (self.image.get_width() * 2, self.image.get_height() * 2))'''
+
+
+class TextBox(pygame.sprite.Sprite):
+    def __init__(self, font: pygame.font.Font, text, position, rendered, screen, color=(255, 255, 255)):
+        super().__init__()
+        self.text = font.render(text, True, color)
+        self.text = self.text.convert_alpha(screen)
+        self.position = position
+        self.rendered = rendered
+        self.alpha = 255
+        self.text.set_alpha(self.alpha)
+
+    def update(self):
+        if self.rendered:
+            self.rendered = False
+            '''
+            self.on = False
+            self.alpha -= 0.01
+            if self.alpha <= 0:
+                self.rendered = False
+            self.text.set_alpha(self.alpha)'''
