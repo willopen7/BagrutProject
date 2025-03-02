@@ -17,14 +17,6 @@ types_of_blocks = {'0': objects.Grass, '1': objects.Wall, '2': objects.Box, '3':
 def check_position(direction, sprites, auras, calm, current_position, player_pos=(400, 400),
                    tile_size=80):  # checks the position of all sprites before moving them so that they won't collide with player
     for sprite in sprites:
-        '''if sprite.__class__ != objects.Portal and (
-                (direction == 'UP' and player_pos[0] == sprite.rect.x and sprite.rect.y == player_pos[1] - tile_size)
-                or (
-                        direction == 'DOWN' and player_pos[0] == sprite.rect.x and sprite.rect.y == player_pos[1] + tile_size)
-                or (
-                        direction == 'LEFT' and player_pos[1] == sprite.rect.y and sprite.rect.x == player_pos[0] - tile_size)
-                or (
-                        direction == 'RIGHT' and player_pos[1] == sprite.rect.y and sprite.rect.x == player_pos[0] + tile_size)):'''
         if sprite.__class__ != objects.Portal and (
                 (direction == 'UP' and current_position[0] == sprite.obj_position[0] and current_position[1] == sprite.obj_position[1] + 1)
                 or (direction == 'DOWN' and current_position[0] == sprite.obj_position[0] and current_position[1] == sprite.obj_position[1] - 1)
@@ -37,9 +29,9 @@ def check_position(direction, sprites, auras, calm, current_position, player_pos
     return True
 
 
-def check_action(popup_details, sprite, all_sprites, all_auras, all_grass, all_rendered, rendered_grass, rendered_auras, mcf, inventory, tile_size, first_use, boxes, store_popup, current_position, message): # checks which class is a specific sprite which is near the player and acts correspondingly
+def check_action(popup_details, sprite, all_sprites, all_auras, all_grass, all_rendered, rendered_grass, rendered_auras, mcf, inventory, tile_size, boxes, store_popup, current_position, message): # checks which class is a specific sprite which is near the player and acts correspondingly
     if sprite.__class__ == objects.Box and sprite in boxes:
-        open_box(inventory, mcf, first_use, message)
+        open_box(inventory, mcf, message)
         boxes.remove(sprite)
         sprite.image = pygame.transform.scale(pygame.image.load(OPEN_BOX_PATH), (tile_size, tile_size))
         sprite.opened = True
@@ -72,15 +64,9 @@ def check_action(popup_details, sprite, all_sprites, all_auras, all_grass, all_r
         inventory[len(inventory)-1].amount = 0
     if sprite.__class__ == objects.EndPortal:
         mcf[0] = -999
-        '''all_sprites.update("", tile_size, player_pos[0], player_pos[1], portal=True,
-                           portal_properties=(sprite.distance_x, sprite.distance_y))
-        all_auras.update("", tile_size, player_pos[0], player_pos[1], portal=True,
-                         portal_properties=(sprite.distance_x, sprite.distance_y))
-        all_grass.update("", tile_size, player_pos[0], player_pos[1], portal=True,
-                         portal_properties=(sprite.distance_x, sprite.distance_y))'''
 
 
-def open_box(inventory, mcf, first_use, message): # creates a random variable to decide the item the player recieves from a box
+def open_box(inventory, mcf, message): # creates a random variable to decide the item the player recieves from a box
     sum = 0
     for i in range(6):
         sum += (5 - inventory[i].amount)
@@ -88,12 +74,16 @@ def open_box(inventory, mcf, first_use, message): # creates a random variable to
     print(chance)
     if chance > 85:
         mcf[0] += SMALL_MONEY
+        message[0] = f"You got {SMALL_MONEY}$. Use it in the shop!"
     elif chance > 80:
         mcf[0] += BIG_MONEY
+        message[0] = f"You got {BIG_MONEY}$. Use it in the shop!"
     elif chance > 72:
         mcf[0] += MEDIUM_MONEY
+        message[0] = f"You got {MEDIUM_MONEY}$. Use it in the shop!"
     elif chance > 70:
         mcf[0] += HUGE_MONEY
+        message[0] = f"You got {HUGE_MONEY}$. Use it in the shop!"
     elif chance > 55:
         inventory[0].amount += 1  # player gets shoes
         message[0] = "You got shoes! These make you go faster"
@@ -123,15 +113,12 @@ def open_box(inventory, mcf, first_use, message): # creates a random variable to
         message[0] = "You got shoes! These make you go faster"
 
 
-
 def find_closest_box(boxes, player_x, player_y, current_position): # a function for the compass object that finds the closest box to the player
     if len(boxes) == 0:
         return None
     closest_box = boxes[0]
-    # closest_distance = abs(boxes[0].rect.x - player_x) + abs(boxes[0].rect.y - player_y)
     closest_distance = abs(boxes[0].obj_position[0] - current_position[0]) + abs(boxes[0].obj_position[1] - current_position[1])
     for b in boxes:
-        # cur = abs(b.rect.x - player_x) + abs(b.rect.y - player_y)
         cur = abs(b.obj_position[0] - current_position[0]) + abs(b.obj_position[1] - current_position[1])
         if cur < closest_distance:
             closest_box = b
@@ -139,28 +126,7 @@ def find_closest_box(boxes, player_x, player_y, current_position): # a function 
     return closest_box
 
 
-def place_map_object_binary(all_sprites, object_type, places, start_coords, main_coords, tile_size, boxes=None): # a function that helps to place many map objects by creating a 2D bool list and using it as a reference for placing the objects
-    for i in range(len(places)):
-        for j in range(len(places[i])):
-            if places[i][j]:
-                cur_obj = object_type(main_coords[0] - (start_coords[0] - j) * tile_size,
-                                      main_coords[1] - (start_coords[1] - i) * tile_size,
-                                      tile_size, tile_size)
-                all_sprites.add(cur_obj)
-                if object_type == objects.Box:
-                    boxes.append(cur_obj)
-
-
-def place_map_object_tuple(all_sprites, object_type, places, main_coords, tile_size, boxes=None): # another function for placing map objects, but this is used when the objects are sparse using a list with specific coordinates of each object
-    for i in range(len(places)):
-        cur_obj = object_type(main_coords[0] + places[i][0] * tile_size, main_coords[1] + places[i][1] * tile_size,
-                              tile_size, tile_size)
-        all_sprites.add(cur_obj)
-        if object_type == objects.Box:
-            boxes.append(cur_obj)
-
-
-def generate_map_txt(types_of_blocks: dict, coordinates, tile_size, start_point, all_sprites, all_grass, all_auras, boxes=None): # generates the blocks based of a txt file. If I have time in the future i want to add a feature that renders only the necessary blocks
+def generate_map_txt(types_of_blocks: dict, coordinates, tile_size, all_sprites, all_grass, all_auras, boxes=None): # generates the blocks based of a txt file. If I have time in the future i want to add a feature that renders only the necessary blocks
     with open(coordinates, "r") as coords:
         map_blocks = coords.readlines()
         for i in range(len(map_blocks)):

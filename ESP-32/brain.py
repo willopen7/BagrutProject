@@ -1,11 +1,11 @@
 from machine import UART
 
-
+print("yop")
 class Brain:
     MAX_PACKET_LENGTH = 32
     EEG_POWER_BANDS = 8
 
-    def __init__(self, uart_port, baud_rate=57600):
+    def __init__(self, uart_port, baud_rate=9600):
         # Initialize UART
         self.uart = UART(uart_port, baudrate=baud_rate)
 
@@ -27,6 +27,15 @@ class Brain:
         self.latest_error = ""
         self.latest_byte = None
         self.last_byte = None
+
+    def get_debug_info(self):
+        return {
+            "latest_byte": self.latest_byte,
+            "packet_index": self.packet_index,
+            "packet_length": self.packet_length,
+            "checksum": self.checksum,
+            "error": self.latest_error
+        }
 
     def update(self):
         parse_return = 0

@@ -46,8 +46,7 @@ def game_loop():
     FOCUS_POTION_PATH = "icons\\focus_potion.png"
     END_SHARD_PATH = "icons\\end_shard.png"
     TOTAL_SHARDS = 8
-    ITEMS_PRICES = [15, 30, 30, 20, 10,
-                    10]  # [0] is shoes, [1] is map, [2] is key, [3] is compass, [4] is calm potion, [5] is focus potion
+    ITEMS_PRICES = [15, 30, 30, 20, 10, 10]  # [0] is shoes, [1] is map, [2] is key, [3] is compass, [4] is calm potion, [5] is focus potion
 
     # VARIABLES
     mcf = [50, 50, 0]  # [0] is money, [1] is calm and [2] is focus
@@ -70,29 +69,27 @@ def game_loop():
                               SCREEN_HEIGHT - INITIAL_TILE_SIZE, INITIAL_TILE_SIZE,
                               INITIAL_TILE_SIZE, END_SHARD_PATH)]
     # [0] is shoes, [1] is map, [2] is key, [3] is compass, [4] is calm potion, [5] is focus potion
-    first_use = [True, True, True, True, True, True]
     NUM_SLOTS = len(inventory)
-    can_move = True
+    can_move = True # after moving, the player has a tiny cooldown depends on the amount of shoes owned. Stores whether the cooldown is on
     map_is_used = False
-    compass_is_used = False
     calm_potion_active = False
     focus_potion_active = False
-    last_calm_potion_use = 0
-    last_focus_potion_use = 0
+    last_calm_potion_use = 0 # stores last calm potion use time
+    last_focus_potion_use = 0 # stores last focus potion use time
     shoes_cooldown = COOLDOWN_WITHOUT_SHOES
-    last_move_time = 0
+    last_move_time = 0 # last time the player moved
     last_map_use = 0
     arrow = None
     arrow_shown = False
     store_popup = [False]  # a list for passing by reference if a store is opened
-    not_enough_money = False
-    enough_money = False
+    not_enough_money = False # if the player tries to buy sth unseccessfully
+    enough_money = False # if the player buys sth
     current_position = [75, 48]
     types_of_blocks = {'0': objects.Grass, '1': objects.Wall, '2': objects.Box, '3': objects.Fountain,
                        '4': objects.Store, '5': objects.SpecialBox, '6': objects.Gate, '7': objects.Monk,
                        '8': objects.EndGrass}
-    opening_screen = True
-    ending_screen = False
+    opening_screen = True # a variable that's on during the opening screen
+    ending_screen = False # a variable that's on during the ending screen
     play_button_rect = pygame.Rect(INITIAL_TILE_SIZE * ((SCREEN_WIDTH // INITIAL_TILE_SIZE) / 2 - 1),
                                    INITIAL_TILE_SIZE * ((SCREEN_HEIGHT // INITIAL_TILE_SIZE) / 2 - 0.5),
                                    INITIAL_TILE_SIZE * 2, INITIAL_TILE_SIZE)
@@ -113,76 +110,20 @@ def game_loop():
     all_texts = pygame.sprite.Group()
     for i in welcome_text_boxes:
         all_texts.add(i)
-    message = [""]
+    message = [""] # message for after getting something from a box
 
     # map setup
-    all_sprites = pygame.sprite.Group()
-    all_auras = pygame.sprite.Group()
-    all_grass = pygame.sprite.Group()
-    all_rendered = pygame.sprite.Group()
-    rendered_grass = pygame.sprite.Group()
-    rendered_auras = pygame.sprite.Group()
+    all_sprites = pygame.sprite.Group() # a group for all the sprites
+    all_auras = pygame.sprite.Group() # a group for the monk aura
+    all_grass = pygame.sprite.Group() # a group for the walkable grass
+    all_rendered = pygame.sprite.Group() # a group for just the rendered sprites
+    rendered_grass = pygame.sprite.Group() # a group for the rendered grass
+    rendered_auras = pygame.sprite.Group() # a group for the rendered auras
     boxes = []
-    cur_obj = None
-    '''walls_places = [[False, False, False, False, True, True, True, True, True, True, True, True, False, False, False],
-                    [False, False, False, False, True, False, False, False, False, False, False, True, False, False,
-                     False],
-                    [False, False, False, False, True, False, False, False, False, False, False, True, False, False,
-                     False],
-                    [False, False, False, False, True, False, False, False, False, False, False, True, False, False,
-                     False],
-                    [True, True, True, True, True, False, False, False, False, False, False, True, True, True, True],
-                    [True, False, False, False, False, False, False, False, False, False, False, False, False, False,
-                     True],
-                    [True, True, True, True, True, False, False, False, False, False, False, False, False, False, True],
-                    [False, False, False, False, True, False, False, False, False, False, False, False, False, False,
-                     True],
-                    [False, False, False, False, True, False, False, False, False, False, False, False, False, False,
-                     True],
-                    [False, False, False, False, True, False, False, False, False, False, False, False, False, False,
-                     True],
-                    [False, False, False, False, True, False, False, False, False, False, False, False, False, False,
-                     True],
-                    [False, False, False, False, True, False, False, False, False, False, False, False, False, False,
-                     True],
-                    [False, False, False, False, True, True, True, True, True, True, True, True, True, True, True]]
-    portal_walls = [[True, True, True, True, True],
-                    [True, False, False, False, True],
-                    [True, True, True, True, True]]
-    grass_places = [[False, False, False, False, True, True, True, True, True, True, False, False, False, False, False],
-                    [False, False, False, False, True, True, True, True, True, True, False, False, False, False, False],
-                    [False, False, False, False, True, True, True, True, True, True, False, False, False, False, False],
-                    [False, False, False, False, True, True, True, True, True, True, False, False, False, False, False],
-                    [True, True, True, True, True, True, True, True, True, True, True, True, True],
-                    [False, False, False, False, True, True, True, True, True, True, True, True, True],
-                    [False, False, False, False, True, True, True, True, True, True, True, True, True],
-                    [False, False, False, False, True, True, True, True, True, True, True, True, True],
-                    [False, False, False, False, True, True, True, True, True, True, True, True, True],
-                    [False, False, False, False, True, True, True, True, True, True, True, True, True],
-                    [False, False, False, False, True, True, True, True, True, True, True, True, True]]
-    boxes_places = [(-2, -4), (-2, -1), (1, -4), (0, -2), (2, -1), (-7, 0), (5, 4)]
-    monk = objects.Monk(PLAYER_X - INITIAL_TILE_SIZE, PLAYER_Y + INITIAL_TILE_SIZE * 4, INITIAL_TILE_SIZE,
-                        INITIAL_TILE_SIZE)
-    all_sprites.add(monk)
-    all_auras.add(monk.monk_auras)
-    all_sprites.add(objects.Fountain(PLAYER_X + INITIAL_TILE_SIZE * 4, PLAYER_Y + INITIAL_TILE_SIZE * 6, INITIAL_TILE_SIZE, INITIAL_TILE_SIZE))
-    all_sprites.add(objects.Store(PLAYER_X + INITIAL_TILE_SIZE * 5, PLAYER_Y + INITIAL_TILE_SIZE * 2, INITIAL_TILE_SIZE, INITIAL_TILE_SIZE))
-    all_sprites.add(objects.Gate(PLAYER_X - INITIAL_TILE_SIZE * 4, PLAYER_Y, INITIAL_TILE_SIZE, INITIAL_TILE_SIZE))
-    all_sprites.add(objects.Portal(PLAYER_X + INITIAL_TILE_SIZE * 5, PLAYER_Y, INITIAL_TILE_SIZE, INITIAL_TILE_SIZE, 17, 0))
-    all_sprites.add(objects.Portal(PLAYER_X - INITIAL_TILE_SIZE * 14, PLAYER_Y, INITIAL_TILE_SIZE, INITIAL_TILE_SIZE, -14, 0))
-    all_grass.add(objects.Grass(PLAYER_X - INITIAL_TILE_SIZE * 14, PLAYER_Y, INITIAL_TILE_SIZE, INITIAL_TILE_SIZE))
-    all_grass.add(objects.Grass(PLAYER_X - INITIAL_TILE_SIZE * 13, PLAYER_Y, INITIAL_TILE_SIZE, INITIAL_TILE_SIZE))
-    all_grass.add(objects.Grass(PLAYER_X - INITIAL_TILE_SIZE * 12, PLAYER_Y, INITIAL_TILE_SIZE, INITIAL_TILE_SIZE))
-    funcs.place_map_object_binary(all_grass, objects.Grass, grass_places, (7, 4), (PLAYER_X, PLAYER_Y),
-                                  INITIAL_TILE_SIZE)
-    funcs.place_map_object_tuple(all_sprites, objects.Box, boxes_places, (PLAYER_X, PLAYER_Y), INITIAL_TILE_SIZE,
-                                 boxes=boxes)
-    funcs.place_map_object_binary(all_sprites, objects.Wall, walls_places, (8, 5), (PLAYER_X, PLAYER_Y),
-                                  INITIAL_TILE_SIZE)
-    funcs.place_map_object_binary(all_sprites, objects.Wall, portal_walls, (15, 1), (PLAYER_X, PLAYER_Y),
-                                  INITIAL_TILE_SIZE)'''
-    map_coords = funcs.generate_map_txt(types_of_blocks, 'map.txt', INITIAL_TILE_SIZE, current_position, all_sprites,
-                                        all_grass, all_auras, boxes=boxes)
+    # cur_obj = None
+    map_coords = funcs.generate_map_txt(types_of_blocks, 'map.txt', INITIAL_TILE_SIZE, all_sprites,
+                                        all_grass, all_auras, boxes=boxes) # map generation
+    # generating special objects
     funcs.create_portals(all_sprites)
     end_gate = objects.EndGate((17, 48), current_tile_size, current_tile_size)
     all_sprites.add(end_gate)
@@ -212,7 +153,6 @@ def game_loop():
     # opening screen
     while opening_screen:
         mouse_pos = pygame.mouse.get_pos()
-        mouse_pressed = pygame.mouse.get_pressed()
         button_color = GRAY if play_button_rect.collidepoint(mouse_pos) else WHITE
         screen.fill(BLACK)
         pygame.draw.rect(screen, button_color, play_button_rect, border_radius=10)
@@ -247,9 +187,6 @@ def game_loop():
                         if funcs.check_position("UP", all_sprites, all_auras, mcf[1], current_position,
                                                 tile_size=current_tile_size) and (can_move or map_is_used):
                             current_position[1] -= 1
-                            '''all_sprites.update("UP", current_tile_size, PLAYER_X, PLAYER_Y)
-                            all_auras.update("UP", current_tile_size, PLAYER_X, PLAYER_Y)
-                            all_grass.update("UP", current_tile_size, PLAYER_X, PLAYER_Y)'''
                             can_move = False
                             last_move_time = current_time
                             main_char.image = main_char.image_back
@@ -259,9 +196,6 @@ def game_loop():
                         if funcs.check_position("DOWN", all_sprites, all_auras, mcf[1], current_position,
                                                 tile_size=current_tile_size) and (can_move or map_is_used):
                             current_position[1] += 1
-                            '''all_sprites.update("DOWN", current_tile_size, PLAYER_X, PLAYER_Y)
-                            all_auras.update("DOWN", current_tile_size, PLAYER_X, PLAYER_Y)
-                            all_grass.update("DOWN", current_tile_size, PLAYER_X, PLAYER_Y)'''
                             can_move = False
                             last_move_time = current_time
                             main_char.image = main_char.image_front
@@ -271,9 +205,6 @@ def game_loop():
                         if funcs.check_position("LEFT", all_sprites, all_auras, mcf[1], current_position,
                                                 tile_size=current_tile_size) and (can_move or map_is_used):
                             current_position[0] -= 1
-                            '''all_sprites.update("LEFT", current_tile_size, PLAYER_X, PLAYER_Y)
-                            all_auras.update("LEFT", current_tile_size, PLAYER_X, PLAYER_Y)
-                            all_grass.update("LEFT", current_tile_size, PLAYER_X, PLAYER_Y)'''
                             can_move = False
                             last_move_time = current_time
                             main_char.image = main_char.image_left
@@ -283,9 +214,6 @@ def game_loop():
                         if funcs.check_position("RIGHT", all_sprites, all_auras, mcf[1], current_position,
                                                 tile_size=current_tile_size) and (can_move or map_is_used):
                             current_position[0] += 1
-                            '''all_sprites.update("RIGHT", current_tile_size, PLAYER_X, PLAYER_Y)
-                            all_auras.update("RIGHT", current_tile_size, PLAYER_X, PLAYER_Y)
-                            all_grass.update("RIGHT", current_tile_size, PLAYER_X, PLAYER_Y)'''
                             can_move = False
                             last_move_time = current_time
                             main_char.image = main_char.image_right
@@ -297,9 +225,6 @@ def game_loop():
                 elif event.key == pygame.K_m and inventory[1].amount > 0 and not store_popup[
                     0]:  # pressing 'm' uses the map, making the render distance bigger for a limited duration
                     current_tile_size = int(INITIAL_TILE_SIZE / 2)
-                    '''all_sprites.update("", current_tile_size, PLAYER_X, PLAYER_Y, portal=False, map_use=True)
-                    all_auras.update("", current_tile_size, PLAYER_X, PLAYER_Y, portal=False, map_use=True)
-                    all_grass.update("", current_tile_size, PLAYER_X, PLAYER_Y, portal=False, map_use=True)'''
                     all_sprites.update(current_position, all_rendered, rendered_grass, rendered_auras, map_use=True)
                     all_auras.update(current_position, all_rendered, rendered_grass, rendered_auras, map_use=True)
                     all_grass.update(current_position, all_rendered, rendered_grass, rendered_auras, map_use=True)
@@ -324,9 +249,6 @@ def game_loop():
                     elif closest_box.rect.x > PLAYER_X:
                         direction += 'r'
                         arrow_position[0] += 1
-                    '''arrow = objects.CompassArrow(PLAYER_X + current_tile_size * arrow_position[0],
-                                                 PLAYER_Y + current_tile_size * arrow_position[1], current_tile_size,
-                                                 current_tile_size)'''
                     arrow = objects.CompassArrow(
                         (current_position[0] + arrow_position[0], current_position[1] + arrow_position[1]),
                         current_tile_size, current_tile_size)
@@ -334,8 +256,7 @@ def game_loop():
                     arrow_shown = True
                     inventory[3].amount -= 1
                 elif event.key == pygame.K_1 and (
-                        (inventory[4].amount > 0 and calm_potion_active is False) or store_popup[
-                    0]):  # if store is opened pressing 1 will try to buy shoes, otherwise it uses a calm potion
+                        (inventory[4].amount > 0 and calm_potion_active is False) or store_popup[0]):  # if store is opened pressing 1 will try to buy shoes, otherwise it uses a calm potion
                     if store_popup[0]:
                         if mcf[0] >= ITEMS_PRICES[0]:
                             inventory[0].amount += 1
@@ -351,8 +272,7 @@ def game_loop():
                         mcf[1] += POTIONS_BOOST
                         inventory[4].amount -= 1
                 elif event.key == pygame.K_2 and (
-                        (inventory[5].amount > 0 and focus_potion_active is False) or store_popup[
-                    0]):  # if store is opened pressing 2 will try to buy a map, otherwise it uses a focus potion
+                        (inventory[5].amount > 0 and focus_potion_active is False) or store_popup[0]):  # if store is opened pressing 2 will try to buy a map, otherwise it uses a focus potion
                     if store_popup[0]:
                         if mcf[0] >= ITEMS_PRICES[1]:
                             inventory[1].amount += 1
@@ -385,8 +305,7 @@ def game_loop():
                     else:
                         not_enough_money = True
                         enough_money = False
-                elif event.key == pygame.K_5 and store_popup[
-                    0]:  # pressing 5 while the store is opened buys a calm potion
+                elif event.key == pygame.K_5 and store_popup[0]:  # pressing 5 while the store is opened buys a calm potion
                     if mcf[0] >= ITEMS_PRICES[4]:
                         inventory[4].amount += 1
                         mcf[0] -= ITEMS_PRICES[4]
@@ -395,8 +314,7 @@ def game_loop():
                     else:
                         not_enough_money = True
                         enough_money = False
-                elif event.key == pygame.K_6 and store_popup[
-                    0]:  # pressing 6 while the store is opened buys a focus potion
+                elif event.key == pygame.K_6 and store_popup[0]:  # pressing 6 while the store is opened buys a focus potion
                     if mcf[0] >= ITEMS_PRICES[5]:
                         inventory[5].amount += 1
                         mcf[0] -= ITEMS_PRICES[5]
@@ -411,16 +329,12 @@ def game_loop():
             for sprite in all_rendered:  # a loop for checking whether the player is near an interactable map object (s.a. a box or a gate)
                 if sprite.near_main is True:
                     funcs.check_action(popup_details, sprite, all_sprites, all_auras, all_grass, all_rendered,
-                                       rendered_grass, rendered_auras, mcf, inventory, current_tile_size,
-                                       first_use, boxes, store_popup, current_position, message)
+                                       rendered_grass, rendered_auras, mcf, inventory, current_tile_size, boxes, store_popup, current_position, message)
                     if mcf[0] == -999:
                         running = False
                         ending_screen = True
                     shoes_cooldown = COOLDOWN_WITHOUT_SHOES / (2 ** inventory[0].amount)
             # draws all the objects onto the screen
-            '''all_grass.draw(screen)
-            all_auras.draw(screen)
-            all_sprites.draw(screen)'''
             rendered_grass.draw(screen)
             rendered_auras.draw(screen)
             all_rendered.draw(screen)
@@ -441,12 +355,6 @@ def game_loop():
             else:
                 screen.blit(FONT.render(f"Money: ${mcf[0]}", True, BLACK), (10, 10))
                 inventory_text = FONT.render(f"Inventory:", True, BLACK)
-                '''screen.blit(FONT.render(f"SHOES: ${ITEMS_PRICES[0]} (to buy press 1)", True, BLACK), (10, 80))
-                screen.blit(FONT.render(f"MAP: ${ITEMS_PRICES[1]} (to buy press 2)", True, BLACK), (10, 100))
-                screen.blit(FONT.render(f"KEY: ${ITEMS_PRICES[2]} (to buy press 3)", True, BLACK), (10, 120))
-                screen.blit(FONT.render(f"COMPASS: ${ITEMS_PRICES[3]} (to buy press 4)", True, BLACK), (10, 140))
-                screen.blit(FONT.render(f"CALM POTION: ${ITEMS_PRICES[4]} (to buy press 5)", True, BLACK), (10, 160))
-                screen.blit(FONT.render(f"FOCUS POTION: ${ITEMS_PRICES[5]} (to buy press 6)", True, BLACK), (10, 180))'''
                 if not_enough_money:
                     screen.blit(FONT_STORE.render(f"NOT ENOUGH MONEY", True, RED),
                                 (SCREEN_WIDTH / 2 - INITIAL_TILE_SIZE * 2.25, SCREEN_HEIGHT - INITIAL_TILE_SIZE * 1.75))
@@ -476,9 +384,6 @@ def game_loop():
         if map_is_used and current_time - last_map_use > MAP_COOLDOWN:
             map_is_used = False
             current_tile_size *= 2
-            '''all_sprites.update("", current_tile_size, PLAYER_X, PLAYER_Y, portal=False, map_end=True)
-            all_grass.update("", current_tile_size, PLAYER_X, PLAYER_Y, portal=False, map_end=True)
-            all_auras.update("", current_tile_size, PLAYER_X, PLAYER_Y, portal=False, map_end=True)'''
             all_sprites.update(current_position, all_rendered, rendered_grass, rendered_auras, map_end=True)
             all_grass.update(current_position, all_rendered, rendered_grass, rendered_auras, map_end=True)
             all_auras.update(current_position, all_rendered, rendered_grass, rendered_auras, map_end=True)

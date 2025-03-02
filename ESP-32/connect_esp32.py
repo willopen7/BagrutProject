@@ -9,11 +9,11 @@ import struct
 from machine import Pin, UART
 from random import randint
 from brain import Brain
+import time
 
 # Init LED
 # led = Pin(2, Pin.OUT)
 # led.value(0)
-
 # Init random value
 value = 0
 
@@ -60,18 +60,17 @@ def get_random_value():
 async def sensor_task():
     while True:
         brain_module.update()
-        print("UART any():", brain_module.uart.any())
+        debug_info = brain_module.debug_info  # ✅ Read debug data
+
+        print(f"🚀 Packet Length: {debug_info.get('packet_length', 'N/A')}")  
+        print(f"🚀 First Full Packet: {debug_info.get('first_packet', [])}")  
+        print(f"🚀 Last Byte Read (Checksum): {debug_info.get('last_byte_read', 'N/A')}")  # ✅ Ensure it's not N/A
+        print(f"Checksum Valid: {debug_info['checksum_valid']}")
+        print(f"Expected: {debug_info['checksum_expected']}, Got: {debug_info['checksum_got']}")
+        print(f"Checksum Accumulator: {debug_info['checksum_accumulator']}")  
+
+        print("All stats:", brain_module.read_csv())  
         await asyncio.sleep_ms(500)
-        '''print(brain_module.read_errors())
-        print('printed')
-        print("Signal Quality:", brain_module.read_signal_quality())
-        print("Errors:", brain_module.read_errors())
-        print("Raw EEG Data:", brain_module.read_power_array())
-        print('All stats: '+ brain_module.read_csv())
-        focus_characteristic.write(_encode_data(brain_module.read_attention()), send_update=True)
-        calm_characteristic.write(_encode_data(brain_module.read_meditation()), send_update=True)
-        print('Written!')
-        await asyncio.sleep_ms(1000)'''
         
 # Serially wait for connections. Don't advertise while a central is connected.
 async def peripheral_task():
