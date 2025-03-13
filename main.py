@@ -111,6 +111,7 @@ def game_loop():
     for i in welcome_text_boxes:
         all_texts.add(i)
     message = [""] # message for after getting something from a box
+    message_portal = [""]
 
     # map setup
     all_sprites = pygame.sprite.Group() # a group for all the sprites
@@ -183,8 +184,10 @@ def game_loop():
                             i.rendered = False
                     if message[0] != "":
                         message[0] = ""
+                    if message_portal[0] != "":
+                        message_portal[0] = ""
                     if event.key == pygame.K_UP:
-                        if funcs.check_position("UP", all_sprites, all_auras, mcf[1], current_position,
+                        if funcs.check_position("UP", all_sprites, all_auras, mcf, current_position, message_portal,
                                                 tile_size=current_tile_size) and (can_move or map_is_used):
                             current_position[1] -= 1
                             can_move = False
@@ -193,7 +196,7 @@ def game_loop():
                             main_char.image = pygame.transform.scale(main_char.image,
                                                                      (current_tile_size, current_tile_size))
                     elif event.key == pygame.K_DOWN:
-                        if funcs.check_position("DOWN", all_sprites, all_auras, mcf[1], current_position,
+                        if funcs.check_position("DOWN", all_sprites, all_auras, mcf[1], current_position, message_portal,
                                                 tile_size=current_tile_size) and (can_move or map_is_used):
                             current_position[1] += 1
                             can_move = False
@@ -202,7 +205,7 @@ def game_loop():
                             main_char.image = pygame.transform.scale(main_char.image,
                                                                      (current_tile_size, current_tile_size))
                     elif event.key == pygame.K_LEFT:
-                        if funcs.check_position("LEFT", all_sprites, all_auras, mcf[1], current_position,
+                        if funcs.check_position("LEFT", all_sprites, all_auras, mcf[1], current_position, message_portal,
                                                 tile_size=current_tile_size) and (can_move or map_is_used):
                             current_position[0] -= 1
                             can_move = False
@@ -211,7 +214,7 @@ def game_loop():
                             main_char.image = pygame.transform.scale(main_char.image,
                                                                      (current_tile_size, current_tile_size))
                     elif event.key == pygame.K_RIGHT:
-                        if funcs.check_position("RIGHT", all_sprites, all_auras, mcf[1], current_position,
+                        if funcs.check_position("RIGHT", all_sprites, all_auras, mcf[1], current_position, message_portal,
                                                 tile_size=current_tile_size) and (can_move or map_is_used):
                             current_position[0] += 1
                             can_move = False
@@ -371,6 +374,7 @@ def game_loop():
                 if text.rendered:
                     screen.blit(text.text, text.position)
             screen.blit(FONT.render(message[0], True, WHITE), (160, 20))
+            screen.blit(FONT.render(message_portal[0], True, RED), (160, 20))
             pygame.display.flip()
         # checks if the wear-off effects are still on and if not turns them off
         if calm_potion_active and current_time - last_calm_potion_use >= POTIONS_DURATION:

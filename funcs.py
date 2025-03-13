@@ -3,7 +3,9 @@ import pygame
 import objects
 import random
 
-DESIRED_CALM = 50
+DESIRED_CALM_AURA = 50
+DESIRED_CALM_PORTAL = 50
+DESIRED_FOCUS_PORTAL = 50
 SMALL_MONEY = 5
 MEDIUM_MONEY = 10
 BIG_MONEY = 15
@@ -14,7 +16,7 @@ STORE_IN_GAME_PATH = "icons\\store_in_game4.png"
 types_of_blocks = {'0': objects.Grass, '1': objects.Wall, '2': objects.Box, '3': objects.Fountain, '4': objects.Store, '5': objects.SpecialBox, '6': objects.Gate, '7': objects.Monk}
 
 
-def check_position(direction, sprites, auras, calm, current_position, player_pos=(400, 400),
+def check_position(direction, sprites, auras, mcf, current_position, message_portal, player_pos=(400, 400),
                    tile_size=80):  # checks the position of all sprites before moving them so that they won't collide with player
     for sprite in sprites:
         if sprite.__class__ != objects.Portal and (
@@ -23,8 +25,14 @@ def check_position(direction, sprites, auras, calm, current_position, player_pos
                 or (direction == 'LEFT' and current_position[1] == sprite.obj_position[1] and current_position[0] == sprite.obj_position[0] + 1)
                 or (direction == 'RIGHT' and current_position[1] == sprite.obj_position[1] and current_position[0] == sprite.obj_position[0] - 1)):
             return False
+        if sprite.__class__ == objects.Portal and (mcf[1] < DESIRED_CALM_PORTAL or mcf[2] < DESIRED_FOCUS_PORTAL):
+            if mcf[1] < DESIRED_CALM_PORTAL:
+                message_portal[0] = "You need to be calmer to enter through the portal"
+            elif mcf[2] < DESIRED_FOCUS_PORTAL:
+                message_portal[0] = "You need to be more focused to enter through the portal"
+            return False
     for aura in auras:
-        if aura.near_main is True and calm < DESIRED_CALM:
+        if aura.near_main is True and mcf[1] < DESIRED_CALM_AURA:
             return False
     return True
 
