@@ -12,6 +12,7 @@ BIG_MONEY = 15
 HUGE_MONEY = 30
 OPEN_BOX_PATH = "icons\\opened-box.png"
 SPECIAL_OPEN_BOX_PATH = "icons\\special_box_open.png"
+FOUNTAIN_PATH = "icons\\fountain.png"
 STORE_IN_GAME_PATH = "icons\\store_in_game4.png"
 types_of_blocks = {'0': objects.Grass, '1': objects.Wall, '2': objects.Box, '3': objects.Fountain, '4': objects.Store, '5': objects.SpecialBox, '6': objects.Gate, '7': objects.Monk}
 
@@ -25,7 +26,11 @@ def check_position(direction, sprites, auras, mcf, current_position, message_por
                 or (direction == 'LEFT' and current_position[1] == sprite.obj_position[1] and current_position[0] == sprite.obj_position[0] + 1)
                 or (direction == 'RIGHT' and current_position[1] == sprite.obj_position[1] and current_position[0] == sprite.obj_position[0] - 1)):
             return False
-        if sprite.__class__ == objects.Portal and (mcf[1] < DESIRED_CALM_PORTAL or mcf[2] < DESIRED_FOCUS_PORTAL):
+        if sprite.__class__ == objects.Portal and (mcf[1] < DESIRED_CALM_PORTAL or mcf[2] < DESIRED_FOCUS_PORTAL) and (
+                (direction == 'UP' and current_position[0] == sprite.obj_position[0] and current_position[1] == sprite.obj_position[1] + 1)
+                or (direction == 'DOWN' and current_position[0] == sprite.obj_position[0] and current_position[1] == sprite.obj_position[1] - 1)
+                or (direction == 'LEFT' and current_position[1] == sprite.obj_position[1] and current_position[0] == sprite.obj_position[0] + 1)
+                or (direction == 'RIGHT' and current_position[1] == sprite.obj_position[1] and current_position[0] == sprite.obj_position[0] - 1)):
             if mcf[1] < DESIRED_CALM_PORTAL:
                 message_portal[0] = "You need to be calmer to enter through the portal"
             elif mcf[2] < DESIRED_FOCUS_PORTAL:
@@ -51,10 +56,11 @@ def check_action(popup_details, sprite, all_sprites, all_auras, all_grass, all_r
         all_sprites.remove(sprite)
         all_rendered.remove(sprite)
         inventory[2].amount -= 1
-    if sprite.__class__ == objects.Fountain:
+    if sprite.__class__ == objects.Fountain and sprite.received is False:
         mcf[0] += int((mcf[1] + mcf[2]) / 2)
-        all_sprites.remove(sprite)
-        all_rendered.remove(sprite)
+        sprite.received = True
+        sprite.image = pygame.transform.scale(pygame.image.load(FOUNTAIN_PATH), (tile_size, tile_size))
+        message[0] = f"You received {int((mcf[1] + mcf[2]) / 2)}$ from the fountain!"
     if sprite.__class__ == objects.Portal and current_position[0] == sprite.obj_position[0] and current_position[1] == sprite.obj_position[1]:
         current_position[0] += sprite.distance_x
         current_position[1] += sprite.distance_y

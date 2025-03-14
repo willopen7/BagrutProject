@@ -49,7 +49,7 @@ def game_loop():
     ITEMS_PRICES = [15, 30, 30, 20, 10, 10]  # [0] is shoes, [1] is map, [2] is key, [3] is compass, [4] is calm potion, [5] is focus potion
 
     # VARIABLES
-    mcf = [50, 50, 0]  # [0] is money, [1] is calm and [2] is focus
+    mcf = [50, 60, 60]  # [0] is money, [1] is calm and [2] is focus
     current_tile_size = INITIAL_TILE_SIZE
     inventory = [
         objects.InventoryItem(0, SCREEN_HEIGHT - INITIAL_TILE_SIZE, INITIAL_TILE_SIZE, INITIAL_TILE_SIZE,
@@ -196,7 +196,7 @@ def game_loop():
                             main_char.image = pygame.transform.scale(main_char.image,
                                                                      (current_tile_size, current_tile_size))
                     elif event.key == pygame.K_DOWN:
-                        if funcs.check_position("DOWN", all_sprites, all_auras, mcf[1], current_position, message_portal,
+                        if funcs.check_position("DOWN", all_sprites, all_auras, mcf, current_position, message_portal,
                                                 tile_size=current_tile_size) and (can_move or map_is_used):
                             current_position[1] += 1
                             can_move = False
@@ -205,7 +205,7 @@ def game_loop():
                             main_char.image = pygame.transform.scale(main_char.image,
                                                                      (current_tile_size, current_tile_size))
                     elif event.key == pygame.K_LEFT:
-                        if funcs.check_position("LEFT", all_sprites, all_auras, mcf[1], current_position, message_portal,
+                        if funcs.check_position("LEFT", all_sprites, all_auras, mcf, current_position, message_portal,
                                                 tile_size=current_tile_size) and (can_move or map_is_used):
                             current_position[0] -= 1
                             can_move = False
@@ -214,7 +214,7 @@ def game_loop():
                             main_char.image = pygame.transform.scale(main_char.image,
                                                                      (current_tile_size, current_tile_size))
                     elif event.key == pygame.K_RIGHT:
-                        if funcs.check_position("RIGHT", all_sprites, all_auras, mcf[1], current_position, message_portal,
+                        if funcs.check_position("RIGHT", all_sprites, all_auras, mcf, current_position, message_portal,
                                                 tile_size=current_tile_size) and (can_move or map_is_used):
                             current_position[0] += 1
                             can_move = False

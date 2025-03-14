@@ -15,6 +15,7 @@ END_GATE_PATH = "icons\\end_gate.png"
 END_PORTAL_PATH = "icons\\end_portal.png"
 PORTAL_PATH = "icons\\portal.webp"
 GATE_PATH = "icons\\gate.png"
+FOUNTAIN_WITH_GOLD_PATH = "icons\\fountain_with_gold.png"
 FOUNTAIN_PATH = "icons\\fountain.png"
 GRASS_PATH = "icons\\grass.jpg"
 END_GRASS_PATH = "icons\\end_grass2.png"
@@ -170,10 +171,15 @@ class MonkAura(MapObj):
 
 class Fountain(MapObj):
     def __init__(self, obj_position, width, height):
-        super().__init__(obj_position, width, height, FOUNTAIN_PATH)
+        super().__init__(obj_position, width, height, FOUNTAIN_WITH_GOLD_PATH)
+        self.received = False
+        self.received_image = pygame.transform.scale(pygame.image.load(FOUNTAIN_PATH), self.original_size)
 
     def update(self, main_position, all_rendered, rendered_grass, rendered_auras, map_use=False, map_end=False):
         super().update(main_position, all_rendered, rendered_grass, rendered_auras, map_use, map_end)
+        if map_end:
+            if self.received:
+                self.image = self.received_image
 
 
 class EndPortal(MapObj):
