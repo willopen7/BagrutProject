@@ -1,4 +1,5 @@
 # main.py
+import sys
 import pygame
 import objects
 import funcs
@@ -162,6 +163,10 @@ def game_loop():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 opening_screen = False
+                sys.exit(0)
+                ble_connection.stop_ble()
+                loop = asyncio.get_event_loop()
+                loop.run_until_complete(ble_connection.ble.disconnect_device())
             if event.type == pygame.MOUSEBUTTONDOWN and play_button_rect.collidepoint(mouse_pos):
                 running = True
                 opening_screen = False
@@ -172,6 +177,8 @@ def game_loop():
         for event in pygame.event.get():  # a loop for all the events (mouse movement, key press etc.) that are happening
             if event.type == pygame.QUIT:
                 running = False
+                sys.exit(0)
+                ble_connection.stop_ble()
                 loop = asyncio.get_event_loop()
                 loop.run_until_complete(ble_connection.ble.disconnect_device())
             elif event.type == pygame.KEYDOWN:
@@ -407,6 +414,13 @@ def game_loop():
         screen.fill(BLACK)
         screen.blit(game_ending_text, (330, 340))
         pygame.display.flip()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                ending_screen = False
+                sys.exit(0)
+                ble_connection.stop_ble()
+                loop = asyncio.get_event_loop()
+                loop.run_until_complete(ble_connection.ble.disconnect_device())
 
 
 if __name__ == "__main__":

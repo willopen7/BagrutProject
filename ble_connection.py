@@ -9,10 +9,16 @@ BLE_CALM_UUID = "19b10001-e8f2-537e-4f6c-d104768a1214"
 ble = BLEModule()
 focus_val = 0
 calm_val = 0
+should_stop = False
 
 
 def get_focus_and_calm():
     return focus_val, calm_val
+
+
+def stop_ble():
+    global should_stop
+    should_stop = True
 
 
 # BLE logic in a separate function
@@ -32,7 +38,7 @@ async def ble_logic(name):
         if not found_device:
             connected = await ble.connect_device(devices[0][1])
         await ble.print_services_and_characteristics()
-        while True:
+        while not should_stop:
             try:
                 focus = await ble.read_characteristic(BLE_FOCUS_UUID)
                 calm = await ble.read_characteristic(BLE_CALM_UUID)

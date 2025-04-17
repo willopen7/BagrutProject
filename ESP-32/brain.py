@@ -1,158 +1,48 @@
-from machine import UART
-
-print("yop")
+from machine import UART, Pin
+import time
+    
+    
 class Brain:
-    MAX_PACKET_LENGTH = 32
-    EEG_POWER_BANDS = 8
-
     def __init__(self, uart_port, baud_rate=9600):
-        # Initialize UART
         self.uart = UART(uart_port, baudrate=baud_rate)
+    
+    def remain_in_bounds(self, val: int, min_val: int, max_val: int):
+        ret = max(min(val, max_val), min_val)
+        return ret
 
-        # Initialization of variables
-        self.fresh_packet = False
-        self.in_packet = False
-        self.packet_index = 0
-        self.packet_length = 0
-        self.checksum = 0
-        self.checksum_accumulator = 0
-        self.has_power = False
-
-        self.signal_quality = 200
-        self.attention = 0
-        self.meditation = 0
-
-        self.packet_data = [0] * self.MAX_PACKET_LENGTH
-        self.eeg_power = [0] * self.EEG_POWER_BANDS
-        self.latest_error = ""
-        self.latest_byte = None
-        self.last_byte = None
-
-    def get_debug_info(self):
-        return {
-            "latest_byte": self.latest_byte,
-            "packet_index": self.packet_index,
-            "packet_length": self.packet_length,
-            "checksum": self.checksum,
-            "error": self.latest_error
-        }
-
-    def update(self):
-        parse_return = 0
-        print("here")
-        if self.uart.any():
-            print("UART Data Available")
-            self.latest_byte = self.uart.read(1)[0]
-            print("Latest Byte Read:", self.latest_byte)
-
-            # Build a packet
-            if self.in_packet:
-                if self.packet_index == 0:
-                    self.packet_length = self.latest_byte
-                    if self.packet_length > self.MAX_PACKET_LENGTH:
-                        self.latest_error = "ERROR: Packet too long"
-                        self.in_packet = False
-                elif self.packet_index <= self.packet_length:
-                    self.packet_data[self.packet_index - 1] = self.latest_byte
-                    self.checksum_accumulator += self.latest_byte
+    def calculate_wave_data(self, data: List):
+        if len(data) < 3:
+            return -1
+        return ((data[0] << 16) + (data[1] << 8) + data[2])
+    
+    def read_packet(self):
+        ret = []
+        while True:
+            if self.uart.any():
+                data = ord(self.uart.read(1))
+                if data == 170:
+                    if self.uart.any():
+                        if ord(self.uart.read(1)) == 170:
+                            return ret
                 else:
-                    self.checksum = self.latest_byte
-                    self.checksum_accumulator = 255 - self.checksum_accumulator
-                    if self.checksum == self.checksum_accumulator:
-                        parse_return = self.parse_packet()
-                        if parse_return > 0:
-                            self.fresh_packet = True
-                        else:
-                            self.latest_error = "ERROR: Could not parse"
-                    else:
-                        self.latest_error = "ERROR: Checksum"
-                    self.in_packet = False
-
-                self.packet_index += 1
-
-            # Look for the start of the packet
-            if self.latest_byte == 170 and self.last_byte == 170 and not self.in_packet:
-                self.in_packet = True
-                self.packet_index = 0
-                self.packet_length = 0
-                self.checksum = 0
-                self.checksum_accumulator = 0
-
-            self.last_byte = self.latest_byte
-
-        if self.fresh_packet:
-            self.fresh_packet = False
-            return parse_return
+                    ret.append(data)   
+            time.sleep(0.01)
+            
+    def get_attention(self, packet):
+        beta = self.calculate_wave_data(packet[19:22]) + self.calculate_wave_data(packet[22:25])
+        theta = self.calculate_wave_data(packet[10:13])
+        if theta == 0:
+            raw_value = beta / (theta + 1)
         else:
-            return 0
-
-    def clear_eeg_power(self):
-        self.eeg_power = [0] * self.EEG_POWER_BANDS
-
-    def parse_packet(self):
-        self.has_power = False
-        self.clear_eeg_power()
-        return_byte = 0x0
-
-        i = 0
-        while i < self.packet_length:
-            data = self.packet_data[i]
-            if data == 0x02:
-                i += 1
-                self.signal_quality = self.packet_data[i]
-                return_byte |= 0b00000001
-            elif data == 0x04:
-                i += 1
-                self.attention = self.packet_data[i]
-                return_byte |= 0b00000010
-            elif data == 0x05:
-                i += 1
-                self.meditation = self.packet_data[i]
-                return_byte |= 0b00000100
-            elif data == 0x83:
-                i += 1
-                for j in range(self.EEG_POWER_BANDS):
-                    self.eeg_power[j] = (
-                            (self.packet_data[i] << 16)
-                            | (self.packet_data[i + 1] << 8)
-                            | self.packet_data[i + 2]
-                    )
-                    i += 3
-                self.has_power = True
-                return_byte |= 0b00001000
-            elif data == 0x80:
-                i += 1
-                self.raw_value = (self.packet_data[i] << 8) | self.packet_data[i + 1]
-                i += 1
-                return_byte |= 0b00010000
-            else:
-                return 0x0
-            i += 1
-
-        return return_byte
-
-    def read_errors(self):
-        return self.latest_error
-
-    def read_signal_quality(self):
-        return self.signal_quality
-
-    def read_attention(self):
-        return self.attention
-
-    def read_meditation(self):
-        return self.meditation
-
-    def read_power_array(self):
-        return self.eeg_power
-
-    def read_csv(self):
-        if self.has_power:
-            return "{},{},{},{}".format(
-                self.signal_quality,
-                self.attention,
-                self.meditation,
-                ",".join(map(str, self.eeg_power)),
-            )
+            raw_value = beta / theta
+        return self.remain_in_bounds(int((raw_value/15) * 100), 1, 100)
+    
+    def get_meditation(self, packet):
+        beta = self.calculate_wave_data(packet[19:22]) + self.calculate_wave_data(packet[22:25])
+        alpha = self.calculate_wave_data(packet[13:16]) + self.calculate_wave_data(packet[16:19])
+        if beta == 0:
+            raw_value = alpha / (beta + 1)
         else:
-            return "{},{},{}".format(self.signal_quality, self.attention, self.meditation)
+            raw_value = alpha / beta
+        return self.remain_in_bounds(int((raw_value/2.5) * 100), 1, 100)
+    
