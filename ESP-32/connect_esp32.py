@@ -59,17 +59,11 @@ def get_random_value():
 # Get new value and update characteristic
 async def sensor_task():
     while True:
-        brain_module.update()
-        debug_info = brain_module.debug_info  # ✅ Read debug data
-
-        print(f"🚀 Packet Length: {debug_info.get('packet_length', 'N/A')}")  
-        print(f"🚀 First Full Packet: {debug_info.get('first_packet', [])}")  
-        print(f"🚀 Last Byte Read (Checksum): {debug_info.get('last_byte_read', 'N/A')}")  # ✅ Ensure it's not N/A
-        print(f"Checksum Valid: {debug_info['checksum_valid']}")
-        print(f"Expected: {debug_info['checksum_expected']}, Got: {debug_info['checksum_got']}")
-        print(f"Checksum Accumulator: {debug_info['checksum_accumulator']}")  
-
-        print("All stats:", brain_module.read_csv())  
+        packet = brain_module.read_packet()
+        attention = brain_module.get_attention(packet)
+        meditation = brain_module.get_meditation(packet)
+        focus_characteristic.write(_encode_data(attention), send_update=True)
+        calm_characteristic.write(_encode_data(meditation), send_update=True)
         await asyncio.sleep_ms(500)
         
 # Serially wait for connections. Don't advertise while a central is connected.
@@ -94,6 +88,8 @@ async def peripheral_task():
 
 async def wait_for_write():
     while True:
+        await asyncio.sleep_ms(1000)
+    '''while True:
         try:
             connection, data = await led_characteristic.written()
             print(data)
@@ -116,7 +112,7 @@ async def wait_for_write():
             print("Error in peripheral_task:", e)
         finally:
             # Ensure the loop continues to the next iteration
-            await asyncio.sleep_ms(100)
+            await asyncio.sleep_ms(100)'''
             
 # dRun tasks
 async def main():
@@ -125,4 +121,5 @@ async def main():
     t3 = asyncio.create_task(wait_for_write())
     await asyncio.gather(t1, t2)
     
+print("hey")
 asyncio.run(main())

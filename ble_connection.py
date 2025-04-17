@@ -4,11 +4,20 @@ from ble_module import BLEModule
 from bleak import BleakClient
 
 NAME = "ESP32"
+BLE_FOCUS_UUID = "1a9fa98f-45ae-4453-b95f-08cb978aa29d"
+BLE_CALM_UUID = "19b10001-e8f2-537e-4f6c-d104768a1214"
+ble = BLEModule()
+focus_val = 0
+calm_val = 0
+
+
+def get_focus_and_calm():
+    return focus_val, calm_val
 
 
 # BLE logic in a separate function
 async def ble_logic(name):
-    ble = BLEModule()
+    global ble, focus_val, calm_val
     devices = await ble.scan_devices()
     print("Found devices:", devices)
     if devices:
@@ -23,9 +32,16 @@ async def ble_logic(name):
         if not found_device:
             connected = await ble.connect_device(devices[0][1])
         await ble.print_services_and_characteristics()
-        val = await ble.read_characteristic('19b10002-e8f2-537e-4f6c-d104768a1214')
-        await ble.write_characteristic('19b10002-e8f2-537e-4f6c-d104768a1214', bytes([0]))
-        print(val)
+        while True:
+            try:
+                focus = await ble.read_characteristic(BLE_FOCUS_UUID)
+                calm = await ble.read_characteristic(BLE_CALM_UUID)
+                focus_val = int(focus.decode('utf-8'))
+                calm_val = int(calm.decode('utf-8'))
+                print(focus_val, calm_val)
+            except Exception as e:
+                print("Error reading characteristics:", e)
+            await asyncio.sleep(1)
 
 
 # BLE thread starter

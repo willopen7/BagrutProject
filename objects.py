@@ -300,9 +300,3 @@ class TextBox(pygame.sprite.Sprite):
     def update(self):
         if self.rendered:
             self.rendered = False
-            '''
-            self.on = False
-            self.alpha -= 0.01
-            if self.alpha <= 0:
-                self.rendered = False
-            self.text.set_alpha(self.alpha)'''

@@ -37,7 +37,7 @@ def game_loop():
     INVENTORY_POS = (10, SCREEN_HEIGHT - INITIAL_TILE_SIZE - FONT_SIZE)
     MAP_COOLDOWN = 2000
     POTIONS_DURATION = 10000
-    POTIONS_BOOST = 10
+    POTIONS_BOOST = 25
     SHOES_IMAGE_PATH = "icons\\shoe.png"
     MAP_IMAGE_PATH = "icons\\map.png"
     KEY_IMAGE_PATH = "icons\\key.png"
@@ -172,6 +172,8 @@ def game_loop():
         for event in pygame.event.get():  # a loop for all the events (mouse movement, key press etc.) that are happening
             if event.type == pygame.QUIT:
                 running = False
+                loop = asyncio.get_event_loop()
+                loop.run_until_complete(ble_connection.ble.disconnect_device())
             elif event.type == pygame.KEYDOWN:
                 if event.key in (pygame.K_UP, pygame.K_DOWN, pygame.K_LEFT, pygame.K_RIGHT):
                     # for each of the arrows, the program checks whether a move can be made (the player doesn't collide with a map object) and then moves all the objects in the opposite direction, making it seem like the player moved
@@ -353,6 +355,13 @@ def game_loop():
             inventory_text = FONT.render(f"Inventory:", True, WHITE)
             screen.blit(FONT.render(f"Money: ${mcf[0]}", True, WHITE), MONEY_POS)
             if not store_popup[0]:
+                focus_val, calm_val = ble_connection.get_focus_and_calm()
+                mcf[1] = calm_val
+                mcf[2] = focus_val
+                if calm_potion_active:
+                    mcf[1] += POTIONS_BOOST
+                if focus_potion_active:
+                    mcf[2] += POTIONS_BOOST
                 screen.blit(FONT.render(f"Calm: {mcf[1]}", True, WHITE), (MONEY_POS[0], MONEY_POS[1] + FONT_SIZE))
                 screen.blit(FONT.render(f"focus: {mcf[2]}", True, WHITE), (MONEY_POS[0], MONEY_POS[1] + FONT_SIZE * 2))
             else:
@@ -401,6 +410,6 @@ def game_loop():
 
 
 if __name__ == "__main__":
-    # ble_thread = threading.Thread(target=ble_connection.start_ble_thread(), daemon=True)
-    # ble_thread.start()
+    ble_thread = threading.Thread(target=ble_connection.start_ble_thread, daemon=True)
+    ble_thread.start()
     game_loop()
