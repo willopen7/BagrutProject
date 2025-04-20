@@ -1,13 +1,8 @@
-from micropython import const
 import asyncio
 import aioble
 import bluetooth
-import struct
-from machine import Pin, UART
 from brain import Brain
 import time
-
-value = 0
 
 _BLE_SERVICE_UUID = bluetooth.UUID('19b10000-e8f2-537e-4f6c-d104768a1214')
 _BLE_FOCUS_CHAR_UUID =bluetooth.UUID('1a9fa98f-45ae-4453-b95f-08cb978aa29d')
@@ -59,7 +54,7 @@ async def peripheral_task():
             # Ensure the loop continues to the next iteration
             await asyncio.sleep_ms(100)
             
-# dRun tasks
+# Run tasks
 async def main():
     t1 = asyncio.create_task(sensor_task())
     t2 = asyncio.create_task(peripheral_task())

@@ -5,7 +5,6 @@ import objects
 import funcs
 import threading
 import ble_connection
-import asyncio
 
 
 # running the game
@@ -23,8 +22,6 @@ def game_loop():
     RED = (255, 0, 0)
     running = False
     INITIAL_TILE_SIZE = 80
-    GRID_WIDTH = SCREEN_WIDTH // INITIAL_TILE_SIZE
-    GRID_HEIGHT = SCREEN_HEIGHT // INITIAL_TILE_SIZE
     PLAYER_X = 400
     PLAYER_Y = 400
     MONEY_POS = (10, 10)
@@ -164,9 +161,6 @@ def game_loop():
             if event.type == pygame.QUIT:
                 opening_screen = False
                 sys.exit(0)
-                ble_connection.stop_ble()
-                loop = asyncio.get_event_loop()
-                loop.run_until_complete(ble_connection.ble.disconnect_device())
             if event.type == pygame.MOUSEBUTTONDOWN and play_button_rect.collidepoint(mouse_pos):
                 running = True
                 opening_screen = False
@@ -178,9 +172,6 @@ def game_loop():
             if event.type == pygame.QUIT:
                 running = False
                 sys.exit(0)
-                ble_connection.stop_ble()
-                loop = asyncio.get_event_loop()
-                loop.run_until_complete(ble_connection.ble.disconnect_device())
             elif event.type == pygame.KEYDOWN:
                 if event.key in (pygame.K_UP, pygame.K_DOWN, pygame.K_LEFT, pygame.K_RIGHT):
                     # for each of the arrows, the program checks whether a move can be made (the player doesn't collide with a map object) and then moves all the objects in the opposite direction, making it seem like the player moved
@@ -418,9 +409,6 @@ def game_loop():
             if event.type == pygame.QUIT:
                 ending_screen = False
                 sys.exit(0)
-                ble_connection.stop_ble()
-                loop = asyncio.get_event_loop()
-                loop.run_until_complete(ble_connection.ble.disconnect_device())
 
 
 if __name__ == "__main__":

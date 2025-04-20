@@ -1,4 +1,4 @@
-from machine import UART, Pin
+from machine import UART
 import time
     
     
@@ -10,7 +10,7 @@ class Brain:
         ret = max(min(val, max_val), min_val)
         return ret
 
-    def calculate_wave_data(self, data: List):
+    def calculate_wave_data(self, data: list):
         if len(data) < 3:
             return -1
         return ((data[0] << 16) + (data[1] << 8) + data[2])
